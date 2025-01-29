@@ -50,19 +50,16 @@ class User extends Authenticatable
     }
 
 //    relations
-    public function products(): HasMany
-    {
-        return $this->hasMany(Product::class, 'user_id');
+    public function colors(): HasMany {
+        return $this->hasMany(Color::class);
     }
 
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class, 'user_id');
+    public function orders(): HasMany {
+        return $this->hasMany(Order::class);
     }
 
-    public function clients(): HasMany
-    {
-        return $this->hasMany(Client::class, 'user_id');
+    public function products(): HasMany {
+        return $this->hasMany(Product::class);
     }
 
 }
