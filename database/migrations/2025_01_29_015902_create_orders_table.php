@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('client_phone')->nullable();
             $table->float('deposited');
             $table->float('total_price');
+            $table->enum('status', ['pending', 'delivered', 'returned', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }
