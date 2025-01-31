@@ -13,5 +13,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', function () {
         return view('Dashboard.index');
     })->name('dashboard');
+    Route::get('products', function () {
+        return 'here';
+    })->name('products');
+
+    Route::get('colors', function () {return 'hree';})->name('colors');
 
 });
