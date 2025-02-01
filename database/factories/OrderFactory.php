@@ -28,7 +28,7 @@ class OrderFactory extends Factory
             'client_phone' => $this->faker->phoneNumber,
             'deposited'    => $this->faker->numberBetween(999, 9999),
             'total_price'  => $this->faker->numberBetween(1000, 10000),
-            'status'       => $this->faker->randomElement(['pending', 'delivered', 'returned', 'cancelled']),
+            'status'       => $this->faker->randomElement(['قيد التنفيذ', 'وصل', 'مرتجع', 'تم الالغاء']),
         ];
     }
 

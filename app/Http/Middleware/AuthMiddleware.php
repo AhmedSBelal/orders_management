@@ -16,7 +16,7 @@ class AuthMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!auth()->check()) {
-            return redirect()->route('login.show'); // Example redirect for unauthenticated users
+            return redirect()->route('login.show'); // redirect for unauthenticated users
         }
         return $next($request);
     }

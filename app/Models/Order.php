@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Requests\Orders\OrdersFilterRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +14,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'location',
         'client_name',
         'client_phone',
@@ -28,6 +30,51 @@ class Order extends Model
 
     public function products(): BelongsToMany {
         return $this->belongsToMany( Product::class, 'order_product', 'order_id',);
+    }
+
+    // filter
+
+    static function ordersByFilter(OrdersFilterRequest $request) {
+
+//        dd($request->all());
+        $orders = self::query();
+
+        if (!empty($request->location)) {
+            $orders->where('location', 'like', '%' . $request->location . '%');
+        }
+
+        if (!empty($request->client_name)) {
+            $orders->where('client_name', 'like', '%' . $request->location . '%');
+        }
+
+        if (!empty($request->client_phone)) {
+            $orders->where('client_phone', 'like', '%' . $request->location . '%');
+        }
+
+        if (!empty($request->status)) {
+            $orders->where('status', $request->status);
+        }
+
+        if (!empty($request->total_price)) {
+            $orders->where('total_price', 'like', '%' . $request->total_price . '%');
+        }
+
+        if (!empty($request->deposited)) {
+            $orders->where('deposited', 'like', '%' . $request->deposited . '%');
+        }
+
+        if(!empty($request->created_at)){
+            $orders->whereDate('created_at', $request->created_at);
+        }
+
+        if(!empty($request->updated_at)){
+            $orders->whereDate('created_at', $request->updated_at);
+        }
+
+        $orders->where('status', "!=", 'وصل');
+
+        return $orders->get();
+
     }
 
 }

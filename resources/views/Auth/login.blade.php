@@ -38,7 +38,7 @@
                                         <span style="color:red;">{{$message}}</span>
                                         @enderror
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" name="remember" type="checkbox" id="rememberMe" checked="">
+                                            <input class="form-check-input" name="remember" type="checkbox" id="rememberMe">
                                             <label class="form-check-label" for="rememberMe">Remember me</label>
                                         </div>
                                         <div class="text-center">

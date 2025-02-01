@@ -1,6 +1,6 @@
 @extends('layout.app-dashboard')
 
-@section('title', 'Dashboard')
+@section('title', $title)
 
 @section('content')
 
@@ -11,7 +11,7 @@
             <div class="container-fluid py-1 px-3">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 ">
-                        <li class="breadcrumb-item text-sm ps-2"><a class="opacity-5 text-dark" href="javascript:;">لوحات القيادة</a></li>
+                        <li class="breadcrumb-item text-sm ps-2"><span class="opacity-5 text-dark">لوحات القيادة</span></li>
                         <li class="breadcrumb-item text-sm text-dark active" aria-current="page">ادارة الاوردرات</li>
                     </ol>
                     <h6 class="font-weight-bolder mb-0">ادارة الاوردرات</h6>
@@ -128,9 +128,8 @@
                                         <p class="text-sm mb-0 text-capitalize font-weight-bold">إضافة وإنشاء طلبية</p>
                                     </div>
                                 </div>
-
                                 <div class="col-4 text-start">
-                                    <a href="">
+                                    <a href="{{route('orders.create')}}">
                                         <div class="icon icon-shape bg-primary shadow text-center border-radius-md">
                                         </div>
                                     </a>
@@ -167,46 +166,50 @@
                         <div class="card-header">
                             <h3 class="card-title">Search Order</h3>
                         </div>
-                        <form action="" method="get">
+                        <form action="" method="GET">
                             @csrf
                             <div class="card-body row">
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">الموقع</label>
-                                    <input type="text" class="form-control" name="location" placeholder="الموقع" value="">
+                                    <input type="text" class="form-control" name="location" placeholder="الموقع" value="{{request('location')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">اسم العميل</label>
-                                    <input type="text" class="form-control" name="client_name" placeholder="اسم العميل" value="">
+                                    <input type="text" class="form-control" name="client_name" placeholder="اسم العميل" value="{{request('client_name')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">رقم العميل</label>
-                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم العميل" value="">
+                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم العميل" value="{{request('client_phone')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">حالة الطلب</label>
-                                    <select name="gender" id="form-label" class="form-control">
+                                    <select name="status" id="form-label" class="form-control">
                                         <option value="">اختر حالة الطلب</option>
-                                        <option value="pending">تحت الانشاء</option>
-                                        <option value="delivered">وصل</option>
-                                        <option value="returned">مرتجع</option>
-                                        <option value="cancelled">تم الالغاء</option>
+                                        <option value="قيد التنفيذ" {{ request('status') == 'قيد التنفيذ' ? 'selected' : '' }}>قيد التنفيذ</option>
+                                        <option value="وصل" {{ request('status') == 'وصل' ? 'selected' : '' }}>وصل</option>
+                                        <option value="مرتجع" {{ request('status') == 'مرتجع' ? 'selected' : '' }}>مرتجع</option>
+                                        <option value="مرتجع" {{ request('status') == 'تم الالغاء' ? 'selected' : '' }}>تم الالغاء</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">السعر</label>
-                                    <input type="text" class="form-control" name="total_price" placeholder="السعر" value="">
+                                    <input type="text" class="form-control" name="total_price" placeholder="السعر" value="{{request('total_price')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">المقدم</label>
-                                    <input type="text" class="form-control" name="deposited" placeholder="المقدم" value="">
+                                    <input type="text" class="form-control" name="deposited" placeholder="المقدم" value="{{request('deposited')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">تاريخ الاضافة</label>
-                                    <input type="date" class="form-control" name="date" value="">
+                                    <input type="date" class="form-control" name="created_at" value="{{request('created_at')}}">
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">تاريخ التعديل</label>
+                                    <input type="date" class="form-control" name="updated_at" value="{{request('updated_at')}}">
                                 </div>
                                 <div class="form-group col-md-3 mb-3 d-flex align-items-end gap-2">
                                     <button class="btn btn-primary" type="submit">Search</button>
-                                    <a href="http://127.0.0.1:8001/admin/teacher/list" class="btn btn-success">Reset</a>
+                                    <a href="{{route('orders.index')}}" class="btn btn-success">Reset</a>
                                 </div>
                             </div>
                         </form> <!--end::Form-->
@@ -218,7 +221,7 @@
                 <div class="col-12">
                     <div class="card mb-4">
                         <div class="card-header pb-0">
-                            <h6>Authors table</h6>
+                            <h6>Orders Table</h6>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
                             <div class="table-responsive p-0">
@@ -226,7 +229,7 @@
                                     <thead>
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الرقم</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">الموقع</th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الموقع</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">اسم العميل</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">رقم العميل</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">حالة الطلب</th>
@@ -236,32 +239,39 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td class="align-middle text-center">
-                                            <div class="d-flex px-2 py-1">1</div>
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            بيبيبيمتمع
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            يببيبيبف
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            01254541064657
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            حثقيبمع
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            حثقيبمع
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            حثقيبمع
-                                        </td>
-                                        <td class="align-middle text-center">
-                                            01254541064657
-                                        </td>
-                                    </tr>
+                                    @foreach($orders as $order)
+                                        <tr>
+                                            <td class="align-middle text-center">
+                                                <div class="d-flex px-2 py-1">{{Str::limit($loop->iteration, 20)}}</div>
+                                            </td>
+                                            <td class="align-middle text-center">
+                                               {{Str::limit($order->location, 20)}}
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                {{Str::limit($order->client_name, 20)}}
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                {{Str::limit($order->client_phone, 20)}}
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                {{Str::limit($order->status, 20)}}
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                {{Str::limit($order->total_price, 20)}}
+                                            </td>
+                                            <td class="align-middle text-center">
+                                                {{Str::limit($order->deposited, 20)}}
+                                            </td>
+                                            <td class="align-middle text-center d-flex p-2">
+                                                <a class="btn btn-success ms-2" href="{{route('orders.show', $order->id)}}">Show</a>
+                                                <form action="{{route('orders.destroy', $order->id)}}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                     </tbody>
                                 </table>
                             </div>

@@ -35,6 +35,7 @@
     <!-- Nepcha Analytics (nepcha.com) -->
     <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
 {{--    <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>--}}
+@yield('css')
 </head>
 
 <body class="g-sidenav-show rtl bg-gray-100">
@@ -44,14 +45,14 @@
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute start-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
         <a class="navbar-brand m-0" href="" target="_blank">
             <img src="{{asset('assets/img/logo-ct-dark.png')}}" class="navbar-brand-img h-100" alt="main_logo">
-            <span class="me-1 font-weight-bold">Management Orders</span>
+            <span class="me-1 font-weight-bold">{{Str::limit(Auth::user()->f_name . ' ' .  Auth()->user()->l_name, 20)}}</span>
         </a>
     </div>
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse px-0 w-auto " id="sidenav-collapse-main">
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link active" href="../pages/rtl.html">
+                <a class="nav-link active" href="{{route('orders.index')}}">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center ms-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="12px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                             <title>settings</title>
@@ -68,7 +69,7 @@
                             </g>
                         </svg>
                     </div>
-                    <span class="nav-link-text me-1">لوحة التحكم</span>
+                    <span class="nav-link-text me-1">الطلبات</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -504,6 +505,7 @@
 {{--<script async defer src="https://buttons.github.io/buttons.js"></script>--}}
 <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="{{asset('assets/js/soft-ui-dashboard.min.js?v=1.1.0')}}"></script>
+@yield('js')
 </body>
 
 </html>
