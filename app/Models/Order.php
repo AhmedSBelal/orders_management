@@ -18,6 +18,8 @@ class Order extends Model
         'location',
         'client_name',
         'client_phone',
+        'city',
+        'post_office',
         'deposited',
         'total_price',
         'status',
@@ -29,14 +31,14 @@ class Order extends Model
     }
 
     public function products(): BelongsToMany {
-        return $this->belongsToMany( Product::class, 'order_product', 'order_id',);
+        return $this->belongsToMany( Product::class, 'order_product', 'order_id')
+            ->withPivot('color_id', 'quantity', 'size'); // Include pivot columns;
     }
 
     // filter
 
     static function ordersByFilter(OrdersFilterRequest $request) {
 
-//        dd($request->all());
         $orders = self::query();
 
         if (!empty($request->location)) {
@@ -70,8 +72,6 @@ class Order extends Model
         if(!empty($request->updated_at)){
             $orders->whereDate('created_at', $request->updated_at);
         }
-
-        $orders->where('status', "!=", 'وصل');
 
         return $orders->get();
 

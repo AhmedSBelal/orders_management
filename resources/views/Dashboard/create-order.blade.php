@@ -21,17 +21,10 @@
 
 @section('content')
 
-    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg overflow-x-hidden">
-
-        <div class="container-fluid py-4">
+<div class="container-fluid py-4">
 
             <div class="col-md-12"> <!--begin::Quick Example-->
                 <div class="card card-primary card-outline mb-4"> <!--begin::Header-->
-                    @if(Session::has('success'))
-                        <div class="row">
-                            <p class="alert alert-info">{{ Session::get('success') }}</p>
-                        </div>
-                    @endif
                     <div class="card-header">
                         <div class="card-title">Add New Order</div>
                     </div> <!--end::Header--> <!--begin::Form-->
@@ -60,13 +53,15 @@
                                     <label class="form-label">حالة الطلب <span style="color: red;">*</span></label>
                                     <select name="status" id="" class="form-control" required>
                                         <option value="">اختر حالة الطلب</option>
-                                        <option value="قيد التنفيذ" {{old('status') == "قيد التنفيذ" ? 'selected' : ''}}>قيد التنفيذ</option>
-                                        <option value="وصل" {{old('status') == "وصل" ? 'selected' : ''}}>وصل</option>
+                                        <option value="تحت التجهيز" {{old('status') == "تحت التجهيز" ? 'selected' : ''}}>تحت التجهيز</option>
+                                        <option value="فى المصنع" {{old('status') == "فى المصنع" ? 'selected' : ''}}>فى المصنع</option>
+                                        <option value="تم التجهيز" {{old('status') == "تم التجهيز" ? 'selected' : ''}}>تم التجهيز</option>
+                                        <option value="تم الشحن" {{old('status') == "تم الشحن" ? 'selected' : ''}}>تم الشحن</option>
                                         <option value="مرتجع" {{old('status') == "مرتجع" ? 'selected' : ''}}>مرتجع</option>
-                                        <option value="تم الالغاء" {{old('status') == "تم الالغاء" ? 'selected' : ''}}>تم الالغاء</option>
+                                        <option value="الغاء" {{old('status') == "الغاء" ? 'selected' : ''}}>الغاء</option>
                                     </select>
                                     <div style="color: red;">
-                                        {{$errors->first('gender')}}
+                                        {{$errors->first('status')}}
                                     </div>
                                 </div>
 
@@ -78,6 +73,21 @@
                                     </div>
                                 </div>
 
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">المحافظه</label>
+                                    <input type="text" class="form-control" name="city" placeholder="المحافظه" value="{{old('city')}}">
+                                    <div style="color: red;">
+                                        {{$errors->first('city')}}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">اسم اقرب بريد</label>
+                                    <input type="text" class="form-control" name="post_office" placeholder="اسم اقرب بريد" value="{{old('post_office')}}">
+                                    <div style="color: red;">
+                                        {{$errors->first('post_office')}}
+                                    </div>
+                                </div>
 
                                 <div class="mb-3 col-md-12">
                                     <label class="form-label">المقدم</label>
@@ -105,6 +115,7 @@
                                     <tr>
                                         <th>Product</th>
                                         <th>Color</th>
+                                        <th>Size</th>
                                         <th>Numbers</th>
                                         <th>Action</th>
                                     </tr>
@@ -129,6 +140,9 @@
                                             </select>
                                         </td>
                                         <td>
+                                            <input type="number" step="0.01" class="form-control" name="sizes[]" placeholder="المقاس" value="{{request('size')}}">
+                                        </td>
+                                        <td>
                                             <input type="number" class="form-control" name="quantities[]" placeholder="عدد" value="{{request('quantity', 1)}}">
                                         </td>
                                         <td>
@@ -148,8 +162,6 @@
             </div>
 
         </div>
-
-    </main>
 
 @endsection
 

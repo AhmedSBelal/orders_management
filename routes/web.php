@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(\App\Http\Controllers\AuthController::class)->group(function () {
 
-    Route::get('login', 'loginShow')->name('login.show');
+    Route::get('/', 'loginShow')->name('login.show');
     Route::post('login', 'login')
         ->middleware('throttle:5,1') // Allow 5 attempts per minute to prevent brute-force attacks
         ->name('login.post');
@@ -19,14 +20,15 @@ Route::controller(\App\Http\Controllers\AuthController::class)->group(function (
 
 Route::middleware(['auth'])->group(function () {
 
+    // Auth
     Route::post('logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
+    // orders
     Route::resource('orders', \App\Http\Controllers\OrderController::class);
+    Route::get('in-processing', [HomeController::class, 'inProcessing'])->name('in-processing');
 
-    Route::get('products', function () {
-        return 'here';
-    })->name('products');
+    Route::resource('products', \App\Http\Controllers\ProductController::class);
 
-    Route::get('colors', function () {return 'hree';})->name('colors');
+    Route::resource('colors', \App\Http\Controllers\ColorController::class);
 
 });

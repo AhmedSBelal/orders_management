@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('location');
             $table->string('client_name');
             $table->string('client_phone')->nullable();
+            $table->string('city')->nullable();
+            $table->string('post_office');
             $table->float('deposited');
             $table->float('total_price');
-            $table->enum('status', ['قيد التنفيذ', 'وصل', 'مرتجع', 'تم الالغاء'])->default('قيد التنفيذ');
+            $table->string('status')->default(\App\Enums\OrderStatuses::InProcessing);
             $table->timestamps();
         });
     }

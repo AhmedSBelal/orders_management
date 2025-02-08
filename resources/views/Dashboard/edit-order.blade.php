@@ -1,0 +1,214 @@
+@extends('layout.app-dashboard')
+
+@section('title', $title)
+
+@section('css')
+    <style>
+        #productTable {
+            margin-bottom: 15px;
+        }
+
+        #productTable th,
+        #productTable td {
+            vertical-align: middle;
+        }
+
+        .remove-row {
+            white-space: nowrap;
+        }
+    </style>
+@endsection
+
+@section('content')
+        <div class="container-fluid py-4">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <div class="card-title">Update Order</div>
+                    </div>
+                    <form action="{{ route('orders.update', $order->id) }}" method="POST" enctype="multipart/form-data">
+                        @method('PUT')
+                        @csrf
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">الموقع <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control" name="location" placeholder="الموقع" required value="{{ old('location', $order->location) }}">
+                                    <div style="color: red;">
+                                        {{ $errors->first('location') }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">اسم العميل <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control" name="client_name" placeholder="اسم العميل" required value="{{ old('client_name', $order->client_name) }}">
+                                    <div style="color: red;">
+                                        {{ $errors->first('client_name') }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">حالة الطلب <span style="color: red;">*</span></label>
+                                    <select name="status" class="form-control" required>
+                                        <option value="">اختر حالة الطلب</option>
+                                        <option value="تحت التجهيز" {{ old('status', $order->status) == "تحت التجهيز" ? 'selected' : '' }}>تحت التجهيز</option>
+                                        <option value="فى المصنع" {{ old('status', $order->status) == "فى المصنع" ? 'selected' : '' }}>فى المصنع</option>
+                                        <option value="تم التجهيز" {{ old('status', $order->status) == "تم التجهيز" ? 'selected' : '' }}>تم التجهيز</option>
+                                        <option value="تم الشحن" {{ old('status', $order->status) == "تم الشحن" ? 'selected' : '' }}>تم الشحن</option>
+                                        <option value="مرتجع" {{ old('status', $order->status) == "مرتجع" ? 'selected' : '' }}>مرتجع</option>
+                                        <option value="الغاء" {{ old('status', $order->status) == "الغاء" ? 'selected' : '' }}>الغاء</option>
+                                    </select>
+                                    <div style="color: red;">
+                                        {{ $errors->first('status') }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">رقم العميل</label>
+                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم العميل" value="{{ old('client_phone', $order->client_phone) }}">
+                                    <div style="color: red;">
+                                        {{ $errors->first('client_phone') }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">المحافظه</label>
+                                    <input type="text" class="form-control" name="city" placeholder="المحافظه" value="{{old('city', $order->city)}}">
+                                    <div style="color: red;">
+                                        {{$errors->first('city')}}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">اسم اقرب بريد</label>
+                                    <input type="text" class="form-control" name="post_office" placeholder="اسم اقرب بريد" value="{{old('post_office', $order->post_office)}}">
+                                    <div style="color: red;">
+                                        {{$errors->first('post_office')}}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-12">
+                                    <label class="form-label">المقدم</label>
+                                    <input type="number" class="form-control" name="deposited" placeholder="المقدم" value="{{ old('deposited', $order->deposited) }}" step="1" min="0">
+                                    <div style="color: red;">
+                                        {{ $errors->first('deposited') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Products and Colors Table -->
+                            <div class="mb-3 col-md-12">
+                                <label class="form-label">Products and Colors</label>
+                                <table class="table table-bordered" id="productTable">
+                                    <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Color</th>
+                                        <th>Size</th>
+                                        <th>Quantity</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @forelse($order->products as $product)
+                                        <tr>
+                                            <td>
+                                                <select class="form-control product-select" name="products[]" required>
+                                                    <option value="">Select Product</option>
+                                                    @foreach($productsData as $p)
+                                                        <option value="{{ $p->id }}" {{ $p->id == $product->id ? 'selected' : '' }}>{{ $p->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control color-select" name="colors[]" required>
+                                                    <option value="">Select Color</option>
+                                                    @foreach($colors as $color)
+                                                        <option value="{{ $color->id }}" {{ $color->id == $product->pivot->color_id ? 'selected' : '' }}>{{ $color->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control" name="sizes[]" placeholder="Size" value="{{ $product->pivot->size }}" required>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control" name="quantities[]" placeholder="Quantity" value="{{ $product->pivot->quantity }}" required>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td>
+                                                <select class="form-control product-select" name="products[]" required>
+                                                    <option value="">Select Product</option>
+                                                    @foreach($productsData as $p)
+                                                        <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control color-select" name="colors[]" required>
+                                                    <option value="">Select Color</option>
+                                                    @foreach($colors as $color)
+                                                        <option value="{{ $color->id }}">{{ $color->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control" name="sizes[]" placeholder="Size" min="1" step="0.01" required>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control" name="quantities[]" placeholder="Quantity" min="1" required>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                    </tbody>
+                                </table>
+                                <button type="button" class="btn btn-primary" id="addRow">Add Row</button>
+                            </div>
+
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+@endsection
+
+@section('js')
+    <script>
+        document.getElementById('addRow').addEventListener('click', function () {
+            // Clone the first row
+            const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+            const newRow = table.rows[0].cloneNode(true);
+
+            // Clear selected values in the new row
+            newRow.querySelector('.product-select').selectedIndex = 0;
+            newRow.querySelector('.color-select').selectedIndex = 0;
+            newRow.querySelector('input[name="sizes[]"]').value = '';
+            newRow.querySelector('input[name="quantities[]"]').value = '';
+
+            // Add the new row to the table
+            table.appendChild(newRow);
+        });
+
+        // Remove row functionality
+        document.addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-row')) {
+                const row = event.target.closest('tr');
+                if (document.getElementById('productTable').getElementsByTagName('tbody')[0].rows.length > 1) {
+                    row.remove();
+                } else {
+                    alert("You cannot remove the last row.");
+                }
+            }
+        });
+    </script>
+@endsection

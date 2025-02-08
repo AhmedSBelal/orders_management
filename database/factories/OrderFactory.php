@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\OrderStatuses;
 use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
@@ -26,9 +27,11 @@ class OrderFactory extends Factory
             'location'     => $this->faker->address,
             'client_name'  => $this->faker->name,
             'client_phone' => $this->faker->phoneNumber,
+            'city'         => $this->faker->city,
+            'post_office'  => $this->faker->postcode,
             'deposited'    => $this->faker->numberBetween(999, 9999),
             'total_price'  => $this->faker->numberBetween(1000, 10000),
-            'status'       => $this->faker->randomElement(['قيد التنفيذ', 'وصل', 'مرتجع', 'تم الالغاء']),
+            'status'       => $this->faker->randomElement(array_column(OrderStatuses::cases(), 'value')),
         ];
     }
 
@@ -38,6 +41,7 @@ class OrderFactory extends Factory
             foreach ($products as $product) {
                 $order->products()->attach($product->id, [
                     'color_id' => Color::inRandomOrder()->first()->id,
+                    'size'     =>  $this->faker->randomFloat(1, 20, 30),
                     'quantity' => rand(1, 10),
                 ]);
             }

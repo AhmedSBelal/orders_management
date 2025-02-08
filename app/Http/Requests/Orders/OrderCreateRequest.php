@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Orders;
 
+use App\Enums\OrderStatuses;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class CreateOrderRequest extends FormRequest
+class OrderCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +26,17 @@ class CreateOrderRequest extends FormRequest
         return [
             "location"     => "required|string|max:255|min:3",
             "client_name"  => "required|string|max:255|min:3",
-            "status"       => "exists:orders,status",
+            "status"       => ['required', Rule::in(OrderStatuses::values())],
             "client_phone" => "string|max:255|min:3|nullable",
+            "city"         => "string|max:255|min:3|required",
+            "post_office"  => "string|max:255|min:3|required",
             "deposited"    => "nullable|integer",
             "products"     => "array",
             "products.*"   => "integer|exists:products,id",
             "colors"       => "array",
             "colors.*"     => "integer|exists:colors,id",
+            "sizes"        => "array",
+            "sizes.*"      => "numeric",
             "quantities"   => "array",
             "quantities.*" => "integer"
         ];
