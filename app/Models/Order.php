@@ -46,11 +46,11 @@ class Order extends Model
         }
 
         if (!empty($request->client_name)) {
-            $orders->where('client_name', 'like', '%' . $request->location . '%');
+            $orders->where('client_name', 'like', '%' . $request->client_name . '%');
         }
 
         if (!empty($request->client_phone)) {
-            $orders->where('client_phone', 'like', '%' . $request->location . '%');
+            $orders->where('client_phone', 'like', '%' . $request->client_phone . '%');
         }
 
         if (!empty($request->status)) {
