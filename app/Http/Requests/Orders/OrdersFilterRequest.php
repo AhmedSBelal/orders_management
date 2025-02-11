@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Orders;
 
+use App\Enums\OrderStatuses;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class OrdersFilterRequest extends FormRequest
 {
@@ -25,7 +27,7 @@ class OrdersFilterRequest extends FormRequest
             'location'       => 'nullable|string',
             'client_name'    => 'nullable|string',
             'client_phone'   => 'nullable|string',
-            'status'         => 'nullable|string|exists:orders,status',
+            'status'         => ['nullable', 'string', Rule::in(OrderStatuses::values())],
             'total_price'    => 'nullable|numeric',
             'deposited'      => 'nullable|numeric',
             'come_from'      => 'nullable|string',

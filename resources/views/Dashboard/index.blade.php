@@ -107,12 +107,11 @@
                                     <label class="form-label">حالة الطلب</label>
                                     <select name="status" id="form-label" class="form-control">
                                         <option value="">اختر حالة الطلب</option>
-                                        <option value="تحت التجهيز" {{request('status') == "تحت التجهيز" ? 'selected' : ''}}>تحت التجهيز</option>
-                                        <option value="فى المصنع" {{request('status') == "فى المصنع" ? 'selected' : ''}}>فى المصنع</option>
-                                        <option value="تم التجهيز" {{request('status') == "تم التجهيز" ? 'selected' : ''}}>تم التجهيز</option>
-                                        <option value="تم الشحن" {{request('status') == "تم الشحن" ? 'selected' : ''}}>تم الشحن</option>
-                                        <option value="مرتجع" {{request('status') == "مرتجع" ? 'selected' : ''}}>مرتجع</option>
-                                        <option value="الغاء" {{request('status') == "الغاء" ? 'selected' : ''}}>الغاء</option>
+                                        @foreach(\App\Enums\OrderStatuses::cases() as $status)
+                                            <option value="{{ $status->value }}" {{ request('status') == $status->value ? 'selected' : '' }}>
+                                                {{ $status->value }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-3">
@@ -128,8 +127,8 @@
                                     <input type="text" class="form-control" name="come_from" placeholder="جاى عن طريق" value="{{request('come_from')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <label class="form-label">حالة دفع الطلب <span style="color: red;">*</span></label>
-                                    <select name="payment_status" id="" class="form-control" required>
+                                    <label class="form-label">حالة دفع الطلب </label>
+                                    <select name="payment_status" id="" class="form-control">
                                         <option value="">حالة دفع الطلب </option>
                                         <option value="تم الدفع" {{request('payment_status') == "تم الدفع" ? 'selected' : ''}}>تم الدفع</option>
                                         <option value="انتظار الدفع" {{request('payment_status') == "انتظار الدفع" ? 'selected' : ''}}>انتظار الدفع</option>

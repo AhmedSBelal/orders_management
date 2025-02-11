@@ -53,12 +53,11 @@
                                     <label class="form-label">حالة الطلب <span style="color: red;">*</span></label>
                                     <select name="status" id="" class="form-control" required>
                                         <option value="">اختر حالة الطلب</option>
-                                        <option value="تحت التجهيز" {{old('status') == "تحت التجهيز" ? 'selected' : ''}}>تحت التجهيز</option>
-                                        <option value="فى المصنع" {{old('status') == "فى المصنع" ? 'selected' : ''}}>فى المصنع</option>
-                                        <option value="تم التجهيز" {{old('status') == "تم التجهيز" ? 'selected' : ''}}>تم التجهيز</option>
-                                        <option value="تم الشحن" {{old('status') == "تم الشحن" ? 'selected' : ''}}>تم الشحن</option>
-                                        <option value="مرتجع" {{old('status') == "مرتجع" ? 'selected' : ''}}>مرتجع</option>
-                                        <option value="الغاء" {{old('status') == "الغاء" ? 'selected' : ''}}>الغاء</option>
+                                        @foreach(\App\Enums\OrderStatuses::cases() as $status)
+                                            <option value="{{ $status->value }}" {{ old('status') == $status->value ? 'selected' : '' }}>
+                                                {{ $status->value }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     <div style="color: red;">
                                         {{$errors->first('status')}}
@@ -106,8 +105,8 @@
                                 </div>
 
                                 <div class="mb-3 col-md-12">
-                                    <label class="form-label">حالة دفع الطلب <span style="color: red;">*</span></label>
-                                    <select name="payment_status" id="" class="form-control" required>
+                                    <label class="form-label">حالة دفع الطلب </label>
+                                    <select name="payment_status" id="" class="form-control" >
                                         <option value="">حالة دفع الطلب </option>
                                         <option value="تم الدفع" {{old('status') == "تم الدفع" ? 'selected' : ''}}>تم الدفع</option>
                                         <option value="انتظار الدفع" {{old('status') == "انتظار الدفع" ? 'selected' : ''}}>انتظار الدفع</option>

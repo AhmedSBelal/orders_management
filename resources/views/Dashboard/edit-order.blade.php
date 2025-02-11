@@ -51,12 +51,11 @@
                                     <label class="form-label">حالة الطلب <span style="color: red;">*</span></label>
                                     <select name="status" class="form-control" required>
                                         <option value="">اختر حالة الطلب</option>
-                                        <option value="تحت التجهيز" {{ old('status', $order->status) == "تحت التجهيز" ? 'selected' : '' }}>تحت التجهيز</option>
-                                        <option value="فى المصنع" {{ old('status', $order->status) == "فى المصنع" ? 'selected' : '' }}>فى المصنع</option>
-                                        <option value="تم التجهيز" {{ old('status', $order->status) == "تم التجهيز" ? 'selected' : '' }}>تم التجهيز</option>
-                                        <option value="تم الشحن" {{ old('status', $order->status) == "تم الشحن" ? 'selected' : '' }}>تم الشحن</option>
-                                        <option value="مرتجع" {{ old('status', $order->status) == "مرتجع" ? 'selected' : '' }}>مرتجع</option>
-                                        <option value="الغاء" {{ old('status', $order->status) == "الغاء" ? 'selected' : '' }}>الغاء</option>
+                                        @foreach(\App\Enums\OrderStatuses::cases() as $status)
+                                            <option value="{{ $status->value }}" {{ old('status', $order->status) == $status->value ? 'selected' : '' }}>
+                                                {{ $status->value }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     <div style="color: red;">
                                         {{ $errors->first('status') }}
