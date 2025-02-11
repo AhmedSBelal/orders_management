@@ -23,6 +23,7 @@ class Order extends Model
         'deposited',
         'total_price',
         'status',
+        'come_from'
     ];
 
     // relations
@@ -63,6 +64,14 @@ class Order extends Model
 
         if (!empty($request->deposited)) {
             $orders->where('deposited', 'like', '%' . $request->deposited . '%');
+        }
+
+        if(!empty($request->come_from)){
+            $orders->where('come_from', 'like','%' . $request->come_from . '%');
+        }
+
+        if (!empty($request->payment_status)) {
+            $orders->where('payment_status', $request->payment_status);
         }
 
         if(!empty($request->created_at)){

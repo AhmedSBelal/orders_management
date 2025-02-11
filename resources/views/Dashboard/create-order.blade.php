@@ -34,16 +34,16 @@
                             <div class="row">
 
                                 <div class="mb-3 col-md-6">
-                                    <label class="form-label">الموقع <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control" name="location" placeholder="الموقع" required value="{{old('location')}}">
+                                    <label class="form-label">العنوان <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control" name="location" placeholder="العنوان" required value="{{old('location')}}">
                                     <div style="color: red;">
                                         {{$errors->first('location')}}
                                     </div>
                                 </div>
 
                                 <div class="mb-3 col-md-6">
-                                    <label class="form-label">اسم العميل <span style="color: red;">*</span></label>
-                                    <input type="text" class="form-control" name="client_name" placeholder="اسم العميل" required value="{{old('client_name')}}">
+                                    <label class="form-label">اسم المرسل اليه <span style="color: red;">*</span></label>
+                                    <input type="text" class="form-control" name="client_name" placeholder="اسم المرسل اليه" required value="{{old('client_name')}}">
                                     <div style="color: red;">
                                         {{$errors->first('client_name')}}
                                     </div>
@@ -66,8 +66,8 @@
                                 </div>
 
                                 <div class="mb-3 col-md-6">
-                                    <label class="form-label">رقم العميل </label>
-                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم العميل" value="{{old('client_phone')}}">
+                                    <label class="form-label">رقم الهاتف </label>
+                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم الهاتف" value="{{old('client_phone')}}">
                                     <div style="color: red;">
                                         {{$errors->first('client_phone')}}
                                     </div>
@@ -82,18 +82,39 @@
                                 </div>
 
                                 <div class="mb-3 col-md-6">
-                                    <label class="form-label">اسم اقرب بريد</label>
-                                    <input type="text" class="form-control" name="post_office" placeholder="اسم اقرب بريد" value="{{old('post_office')}}">
+                                    <label class="form-label">مكتب البريد </label>
+                                    <input type="text" class="form-control" name="post_office" placeholder="مكتب البريد" value="{{old('post_office')}}">
                                     <div style="color: red;">
                                         {{$errors->first('post_office')}}
                                     </div>
                                 </div>
 
-                                <div class="mb-3 col-md-12">
+                                <div class="mb-3 col-md-6">
                                     <label class="form-label">المقدم</label>
                                     <input type="number" class="form-control" name="deposited" placeholder="المقدم" value="{{old('deposited', 0)}}"  step="1" min="0" max="100">
                                     <div style="color: red;">
                                         {{$errors->first('deposited')}}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">جاى عن طريق </label>
+                                    <input type="text" class="form-control" name="come_from" placeholder="جاى عن طريق" value="{{old('come_from')}}">
+                                    <div style="color: red;">
+                                        {{$errors->first('come_from')}}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 col-md-12">
+                                    <label class="form-label">حالة دفع الطلب <span style="color: red;">*</span></label>
+                                    <select name="payment_status" id="" class="form-control" required>
+                                        <option value="">حالة دفع الطلب </option>
+                                        <option value="تم الدفع" {{old('status') == "تم الدفع" ? 'selected' : ''}}>تم الدفع</option>
+                                        <option value="انتظار الدفع" {{old('status') == "انتظار الدفع" ? 'selected' : ''}}>انتظار الدفع</option>
+                                        <option value="لم يتم الدفع" {{old('status') == "لم يتم الدفع" ? 'selected' : ''}}>لم يتم الدفع</option>
+                                    </select>
+                                    <div style="color: red;">
+                                        {{$errors->first('payment_status')}}
                                     </div>
                                 </div>
 

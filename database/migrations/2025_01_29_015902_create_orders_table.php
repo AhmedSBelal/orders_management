@@ -22,6 +22,8 @@ return new class extends Migration
             $table->float('deposited');
             $table->float('total_price');
             $table->string('status')->default(\App\Enums\OrderStatuses::InProcessing);
+            $table->string('come_from')->nullable();
+            $table->string('payment_status')->nullable()->default(\App\Enums\PaymentStatus::WaitPaid);
             $table->timestamps();
         });
     }

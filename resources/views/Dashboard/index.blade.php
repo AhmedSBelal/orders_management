@@ -2,8 +2,37 @@
 
 @section('title', $title)
 
-@section('content')
+@section('css')
 
+
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+
+@endsection
+
+    @section('content')
+
+        <!-- Modal Structure -->
+        <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmationModalLabel">تأكيد الحذف</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p class="text-lg mb-4">هل انت متأكد من حذف هذا الاوردر؟</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="confirmDeletion()" class="btn btn-danger">نعم، امسح</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">لا</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         <div class="container-fluid py-4">
@@ -63,16 +92,16 @@
                             @csrf
                             <div class="card-body row">
                                 <div class="col-md-2 mb-3">
-                                    <label class="form-label">الموقع</label>
-                                    <input type="text" class="form-control" name="location" placeholder="الموقع" value="{{request('location')}}">
+                                    <label class="form-label">العنوان</label>
+                                    <input type="text" class="form-control" name="location" placeholder="العنوان" value="{{request('location')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <label class="form-label">اسم العميل</label>
-                                    <input type="text" class="form-control" name="client_name" placeholder="اسم العميل" value="{{request('client_name')}}">
+                                    <label class="form-label">اسم المرسل اليه</label>
+                                    <input type="text" class="form-control" name="client_name" placeholder="اسم المرسل اليه" value="{{request('client_name')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
-                                    <label class="form-label">رقم العميل</label>
-                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم العميل" value="{{request('client_phone')}}">
+                                    <label class="form-label">رقم الهاتف</label>
+                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم الهاتف" value="{{request('client_phone')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">حالة الطلب</label>
@@ -93,6 +122,22 @@
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">المقدم</label>
                                     <input type="text" class="form-control" name="deposited" placeholder="المقدم" value="{{request('deposited')}}">
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">جاى عن طريق</label>
+                                    <input type="text" class="form-control" name="come_from" placeholder="جاى عن طريق" value="{{request('come_from')}}">
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">حالة دفع الطلب <span style="color: red;">*</span></label>
+                                    <select name="payment_status" id="" class="form-control" required>
+                                        <option value="">حالة دفع الطلب </option>
+                                        <option value="تم الدفع" {{request('payment_status') == "تم الدفع" ? 'selected' : ''}}>تم الدفع</option>
+                                        <option value="انتظار الدفع" {{request('payment_status') == "انتظار الدفع" ? 'selected' : ''}}>انتظار الدفع</option>
+                                        <option value="لم يتم الدفع" {{request('payment_status') == "لم يتم الدفع" ? 'selected' : ''}}>لم يتم الدفع</option>
+                                    </select>
+                                    <div style="color: red;">
+                                        {{$errors->first('payment_status')}}
+                                    </div>
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">تاريخ الاضافة</label>
@@ -124,9 +169,9 @@
                                     <thead>
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الرقم</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الموقع</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">اسم العميل</th>
-                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">رقم العميل</th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">العنوان</th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">اسم المرسل اليه</th>
+                                        <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">رقم الهاتف</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">حالة الطلب</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">السعر</th>
                                         <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">المقدم</th>
@@ -159,10 +204,11 @@
                                             </td>
                                             <td class="align-middle text-center d-flex p-2">
                                                 <a class="btn btn-success ms-2" href="{{route('orders.edit', $order->id)}}">Edit</a>
-                                                <form action="{{route('orders.destroy', $order->id)}}" method="POST">
+                                                <!-- Delete Button to Trigger Modal -->
+                                                <form id="delete-order-form-{{ $order->id }}" action="{{ route('orders.destroy', $order->id) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                    <button type="button" class="btn btn-danger" onclick="showConfirmationModal({{ $order->id }})">حذف</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -177,5 +223,25 @@
 
         </div>
 
+
+@endsection
+
+@section('js')
+
+    <script>
+        let deleteFormId = null;
+
+        function showConfirmationModal(orderId) {
+            deleteFormId = orderId;
+            const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            confirmationModal.show();
+        }
+
+        function confirmDeletion() {
+            if (deleteFormId !== null) {
+                document.getElementById(`delete-order-form-${deleteFormId}`).submit();
+            }
+        }
+    </script>
 
 @stop

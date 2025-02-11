@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\OrderStatuses;
+use App\Enums\PaymentStatus;
 use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
@@ -32,6 +33,8 @@ class OrderFactory extends Factory
             'deposited'    => $this->faker->numberBetween(999, 9999),
             'total_price'  => $this->faker->numberBetween(1000, 10000),
             'status'       => $this->faker->randomElement(array_column(OrderStatuses::cases(), 'value')),
+            'come_from'    => $this->faker->randomElement(['فيس', 'واتس بيزنز', 'واتس عادي']),
+            'payment_status' => $this->faker->randomElement(array_column(PaymentStatus::cases(), 'value')),
         ];
     }
 

@@ -75,7 +75,8 @@ class OrderController extends Controller
             'post_office'  => $data['post_office'],
             'deposited'    => $data['deposited'],
             'total_price'  => $total_price,
-            'status'       => $data['status']
+            'status'       => $data['status'],
+            'come_from'    => $data['come_from'],
         ]);
 
         for ($i = 0; $i < $sz; $i++) {

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Orders;
 
 use App\Enums\OrderStatuses;
+use App\Enums\PaymentStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,6 +32,8 @@ class OrderUpdateRequest extends FormRequest
             "city"         => "string|max:255|min:3|required",
             "post_office"  => "string|max:255|min:3|required",
             "deposited"    => "nullable|integer",
+            "come_from"    => "nullable|string|max:255|min:3",
+            "payment_status" => ['nullable', Rule::in(PaymentStatus::values())],
             "products"     => "array",
             "products.*"   => "integer|exists:products,id",
             "colors"       => "array",

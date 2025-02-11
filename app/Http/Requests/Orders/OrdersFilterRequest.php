@@ -22,14 +22,16 @@ class OrdersFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'location'     => 'nullable|string',
-            'client_name'  => 'nullable|string',
-            'client_phone' => 'nullable|string',
-            'status'       => 'nullable|string|exists:orders,status',
-            'total_price'  => 'nullable|numeric',
-            'deposited'    => 'nullable|numeric',
-            'created_at'   => 'nullable|date',
-            'updated_at'   => 'nullable|date',
+            'location'       => 'nullable|string',
+            'client_name'    => 'nullable|string',
+            'client_phone'   => 'nullable|string',
+            'status'         => 'nullable|string|exists:orders,status',
+            'total_price'    => 'nullable|numeric',
+            'deposited'      => 'nullable|numeric',
+            'come_from'      => 'nullable|string',
+            'payment_status' => 'nullable|string',
+            'created_at'     => 'nullable|date',
+            'updated_at'     => 'nullable|date',
         ];
     }
 }
