@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('color_id')->constrained('colors')->onDelete('cascade');
             $table->float('size');
             $table->integer('quantity');
+            $table->boolean('is_done')->default(false);
             $table->timestamps();
         });
     }

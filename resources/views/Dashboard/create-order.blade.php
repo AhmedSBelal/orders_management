@@ -137,6 +137,7 @@
                                         <th>Color</th>
                                         <th>Size</th>
                                         <th>Numbers</th>
+                                        <td>Done</td>
                                         <th>Action</th>
                                     </tr>
                                     </thead>
@@ -166,6 +167,12 @@
                                             <input type="number" class="form-control" name="quantities[]" placeholder="عدد" value="{{request('quantity', 1)}}">
                                         </td>
                                         <td>
+                                            <div class="form-check form-switch d-flex px-4">
+{{--                                                <input type="hidden" name="is_done[]" value="0"> <!-- Hidden input -->--}}
+                                                <input class="form-check-input" type="checkbox" name="is_done[0]" value="1">
+                                            </div>
+                                        </td>
+                                        <td>
                                             <button type="button" class="btn btn-danger btn-sm remove-row">Remove</button>
                                         </td>
                                     </tr>
@@ -191,11 +198,30 @@
         document.getElementById('addRow').addEventListener('click', function () {
             // Clone the first row
             const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
-            const newRow = table.rows[0].cloneNode(true);
+            const newRow = table.rows[table.rows.length - 1].cloneNode(true);
+
+            // Select the input element inside the 5th <td>
+            let inputElement = newRow.children[4].children[0].children[0];
+
+            // Extract the current index (if exists) and increment it
+            let match = inputElement.name.match(/\d+/); // Find existing number in the name
+            let index = match ? parseInt(match[0]) + 1 : 0; // Increment if exists, else start from 0
+
+            // // Update the input name with the new index
+            inputElement.name = `is_done[${index}]`;
+            // inputElement.value = 0;
+            newRow.children[4].children[0].children[0] = inputElement;
+
 
             // Clear selected values in the new row
             newRow.querySelector('.product-select').selectedIndex = 0;
             newRow.querySelector('.color-select').selectedIndex = 0;
+            newRow.querySelector('input[name="sizes[]"]').value = '';
+            newRow.querySelector('input[name="quantities[]"]').value = 1;
+
+            const checkboxInput = newRow.querySelector('input[type="checkbox"]');
+
+            checkboxInput.checked = false; // Ensure the checkbox is unchecked
 
             // Add the new row to the table
             table.appendChild(newRow);

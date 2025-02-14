@@ -44,10 +44,12 @@ class OrderController extends Controller
     public function store(OrderCreateRequest $request)
     {
         $data = $request->validated();
+//        dd($data);
         $productsId = $data['products'];
         $colorsId = $data['colors'];
         $quantities = $data['quantities'];
         $sizes = $data['sizes'];
+        $isDone = $data['is_done'];
 
         $productQuantity = [];
         $sz = count($data['colors']);
@@ -83,7 +85,8 @@ class OrderController extends Controller
             $order->products()->attach($productsId[$i], [
                 "color_id"   => $colorsId[$i],
                 "size"       => $sizes[$i],
-                "quantity"   => $quantities[$i]
+                "quantity"   => $quantities[$i],
+                "is_done"    => !empty($isDone[$i]) ? 1 : 0,
             ]);
         }
 
@@ -122,8 +125,10 @@ class OrderController extends Controller
             $product['color_id'] = $product->pivot->color_id;
             $product['size'] = $product->pivot->size;
             $product['quantity'] = $product->pivot->quantity;
+            $product['is_done'] = $product->pivot->is_done;
         }
         $order['products'] = $products;
+//        dd($order);
         return view('Dashboard.edit-order', compact('title', 'order', 'colors', 'productsData'));
     }
 
@@ -137,6 +142,7 @@ class OrderController extends Controller
         $productsId = $data['products'];
         $colorsId = $data['colors'];
         $quantities = $data['quantities'];
+        $isDone = $data['is_done'];
         $sizes = $data['sizes'];
 
         $productQuantity = [];
@@ -155,7 +161,7 @@ class OrderController extends Controller
         foreach ($products as $product) {
             $total_price += $product->price * $productQuantity[$product->id]['quantity'];
         }
-
+//        dd($data);
         $order->update([
             'location'     => $data['location'],
             'client_name'  => $data['client_name'],
@@ -175,7 +181,8 @@ class OrderController extends Controller
             $order->products()->attach($productsId[$i], [
                 "color_id"   => $colorsId[$i],
                 "size"       => $sizes[$i],
-                "quantity"   => $quantities[$i]
+                "quantity"   => $quantities[$i],
+                "is_done"    => $isDone[$i],
             ]);
         }
 

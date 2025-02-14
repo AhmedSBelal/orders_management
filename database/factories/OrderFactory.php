@@ -46,6 +46,7 @@ class OrderFactory extends Factory
                     'color_id' => Color::inRandomOrder()->first()->id,
                     'size'     =>  $this->faker->randomFloat(1, 20, 30),
                     'quantity' => rand(1, 10),
+                    'is_done'  => rand(true, false),
                 ]);
             }
         });

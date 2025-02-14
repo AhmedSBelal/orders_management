@@ -41,7 +41,9 @@ class OrderUpdateRequest extends FormRequest
             "sizes"        => "array",
             "sizes.*"      => "numeric",
             "quantities"   => "array",
-            "quantities.*" => "integer"
+            "quantities.*" => "integer",
+            'is_done'      => "array",
+            "is_done.*"    => "boolean",
         ];
     }
 }

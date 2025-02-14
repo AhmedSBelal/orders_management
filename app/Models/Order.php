@@ -23,7 +23,8 @@ class Order extends Model
         'deposited',
         'total_price',
         'status',
-        'come_from'
+        'come_from',
+        'payment_status'
     ];
 
     // relations
@@ -33,7 +34,7 @@ class Order extends Model
 
     public function products(): BelongsToMany {
         return $this->belongsToMany( Product::class, 'order_product', 'order_id')
-            ->withPivot('color_id', 'quantity', 'size'); // Include pivot columns;
+            ->withPivot('color_id', 'quantity', 'size', 'is_done'); // Include pivot columns;
     }
 
     // filter
