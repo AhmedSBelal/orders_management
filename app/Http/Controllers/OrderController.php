@@ -9,6 +9,7 @@ use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -20,11 +21,12 @@ class OrderController extends Controller
         try {
             $title = 'Dashboard - Orders';
             $orders = Order::ordersByFilter($request);
+            // $orders = $orders->paginate(10);
             return view('Dashboard.index', compact('orders', 'title'));
         } catch (\Exception $exception) {
-            return 'something went wrong';
+            Log::error('Error in OrderController@index: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while fetching orders. Please try again later.');
         }
-
     }
 
     /**
@@ -32,10 +34,15 @@ class OrderController extends Controller
      */
     public function create()
     {
-        $title = 'Create - Order';
-        $products = Product::all();
-        $colors = Color::all();
-        return view('Dashboard.create-order', compact('title', 'products', 'colors'));
+        try {
+            $title = 'Create - Order';
+            $products = Product::all();
+            $colors = Color::all();
+            return view('Dashboard.create-order', compact('title', 'products', 'colors'));
+        } catch (\Exception $exception) {
+            Log::error('Error in OrderController@create: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while loading the create form. Please try again later.');
+        }
     }
 
     /**
@@ -43,76 +50,42 @@ class OrderController extends Controller
      */
     public function store(OrderCreateRequest $request)
     {
-        $data = $request->validated();
-//        dd($data);
-        $productsId = $data['products'];
-        $colorsId = $data['colors'];
-        $quantities = $data['quantities'];
-        $sizes = $data['sizes'];
-        if (empty($data['is_done'])) {
-            $data['is_done'] = [];
-        }
-        $isDone = $data['is_done'];
+        try {
+            $data = $request->validated();
+            
+            if (!$this->validateArrays($data)) {
+                return redirect()->back()->with('error', 'Invalid product data. Please check your input.');
+            }
 
-        $productQuantity = [];
-        $sz = count($data['colors']);
-        for ($i = 0; $i < $sz; $i++) {
-            $productQuantity[$productsId[$i]]['quantity'] = !isset($productQuantity[$productsId[$i]]['quantity']) ? 0 : $productQuantity[$productsId[$i]]['quantity'];
-            $productQuantity[$productsId[$i]] = [
-                'quantity' => $productQuantity[$productsId[$i]]['quantity'] + $quantities[$i],
-                ];
-        }
+            $productsId = $data['products'];
+            $colorsId = $data['colors'];
+            $quantities = $data['quantities'];
+            $sizes = $data['sizes'];
+            $isDone = $data['is_done'] ?? [];
 
-        $products = Product::whereIn('id', $productsId)->get();
+            $productQuantity = $this->calculateProductQuantities($productsId, $quantities);
+            $total_price = $this->calculateTotalPrice($productsId, $productQuantity);
 
-        $total_price = 0;
-
-        foreach ($products as $product) {
-            $total_price += $product->price * $productQuantity[$product->id]['quantity'];
-        }
-
-        $order = Order::create([
-            'user_id'      => auth()->id(),
-            'location'     => $data['location'],
-            'client_name'  => $data['client_name'],
-            'client_phone' => $data['client_phone'],
-            'city'         => $data['city'],
-            'post_office'  => $data['post_office'],
-            'deposited'    => $data['deposited'],
-            'total_price'  => $total_price,
-            'status'       => $data['status'],
-            'come_from'    => $data['come_from'],
-        ]);
-
-        for ($i = 0; $i < $sz; $i++) {
-            $order->products()->attach($productsId[$i], [
-                "color_id"   => $colorsId[$i],
-                "size"       => $sizes[$i],
-                "quantity"   => $quantities[$i],
-                "is_done"    => !empty($isDone[$i]) ? 1 : 0,
+            $order = Order::create([
+                'user_id'      => auth()->id(),
+                'location'     => $data['location'],
+                'client_name'  => $data['client_name'],
+                'client_phone' => $data['client_phone'],
+                'city'         => $data['city'],
+                // 'post_office'  => $data['post_office'],
+                'deposited'    => $data['deposited'],
+                'total_price'  => $total_price,
+                'status'       => $data['status'],
+                'come_from'    => $data['come_from'],
             ]);
+
+            $this->attachProductsToOrder($order, $productsId, $colorsId, $sizes, $quantities, $isDone);
+
+            return redirect()->route('orders.create')->with('success', 'Order created successfully.');
+        } catch (\Exception $exception) {
+            Log::error('Error in OrderController@store: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while creating the order. Please try again later.');
         }
-
-        return redirect()->route('orders.create')->with('success', 'Order created successfully.');
-
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Order $order)
-    {
-//        $title = 'Show - Order';
-//        $colors = Color::all();
-//        $products = Product::all();
-//        $products = $order->products()->get();
-//        foreach ($products as $product) {
-//            $product['color_id'] = $product->pivot->color_id;
-//            $product['size'] = $product->pivot->size;
-//            $product['quantity'] = $product->pivot->quantity;
-//        }
-//        $order['products'] = $products;
-//        return view('Dashboard.show-order', compact('title', 'order', 'colors', 'products'));
     }
 
     /**
@@ -120,76 +93,73 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        $title = 'Edit - Order';
-        $colors = Color::all();
-        $productsData = Product::all();
-        $products = $order->products()->get();
-        foreach ($products as $product) {
-            $product['color_id'] = $product->pivot->color_id;
-            $product['size'] = $product->pivot->size;
-            $product['quantity'] = $product->pivot->quantity;
-            $product['is_done'] = $product->pivot->is_done;
-        }
-        $order['products'] = $products;
-//        dd($order);
-        return view('Dashboard.edit-order', compact('title', 'order', 'colors', 'productsData'));
-    }
+        try {
+            $title = 'Edit - Order';
+            $colors = Color::all();
+            $productsData = Product::all();
+            $products = $order->products()->get();
+            
+            $products = $products->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'color_id' => $product->pivot->color_id,
+                    'size' => $product->pivot->size,
+                    'quantity' => $product->pivot->quantity,
+                    'is_done' => $product->pivot->is_done
+                ];
+            });
 
+            return view('Dashboard.edit-order', compact('title', 'order', 'colors', 'productsData', 'products'));
+        } catch (\Exception $exception) {
+            Log::error('Error in OrderController@edit: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while loading the edit form. Please try again later.');
+        }
+    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(OrderUpdateRequest $request, Order $order)
     {
-        $data = $request->validated();
-        $productsId = $data['products'];
-        $colorsId = $data['colors'];
-        $quantities = $data['quantities'];
-        $isDone = $data['is_done'];
-        $sizes = $data['sizes'];
+        try {
+            $data = $request->validated();
+            
+            if (!$this->validateArrays($data)) {
+                return redirect()->back()->with('error', 'Invalid product data. Please check your input.');
+            }
 
-        $productQuantity = [];
-        $sz = count($data['colors']);
-        for ($i = 0; $i < $sz; $i++) {
-            $productQuantity[$productsId[$i]]['quantity'] = !isset($productQuantity[$productsId[$i]]['quantity']) ? 0 : $productQuantity[$productsId[$i]]['quantity'];
-            $productQuantity[$productsId[$i]] = [
-                'quantity' => $productQuantity[$productsId[$i]]['quantity'] + $quantities[$i],
-            ];
-        }
+            $productsId = $data['products'];
+            $colorsId = $data['colors'];
+            $quantities = $data['quantities'];
+            $sizes = $data['sizes'];
+            $isDone = $data['is_done'] ?? [];
 
-        $products = Product::whereIn('id', $productsId)->get();
+            $productQuantity = $this->calculateProductQuantities($productsId, $quantities);
+            $total_price = $this->calculateTotalPrice($productsId, $productQuantity);
 
-        $total_price = 0;
-
-        foreach ($products as $product) {
-            $total_price += $product->price * $productQuantity[$product->id]['quantity'];
-        }
-//        dd($data);
-        $order->update([
-            'location'     => $data['location'],
-            'client_name'  => $data['client_name'],
-            'client_phone' => $data['client_phone'],
-            'city'         => $data['city'],
-            'post_office'  => $data['post_office'],
-            'deposited'    => $data['deposited'],
-            'total_price'  => $total_price,
-            'status'       => $data['status'],
-            'come_from'    => $data['come_from'],
-            'payment_status' => $data['payment_status'],
-        ]);
-
-        $order->products()->detach();
-
-        for ($i = 0; $i < $sz; $i++) {
-            $order->products()->attach($productsId[$i], [
-                "color_id"   => $colorsId[$i],
-                "size"       => $sizes[$i],
-                "quantity"   => $quantities[$i],
-                "is_done"    => !empty($isDone[$i]) ? 1 : 0,
+            $order->update([
+                'location'     => $data['location'],
+                'client_name'  => $data['client_name'],
+                'client_phone' => $data['client_phone'],
+                'city'         => $data['city'],
+                // 'post_office'  => $data['post_office'],
+                'deposited'    => $data['deposited'],
+                'total_price'  => $total_price,
+                'status'       => $data['status'],
+                'come_from'    => $data['come_from'],
+                'payment_status' => $data['payment_status'],
             ]);
-        }
 
-        return redirect()->back()->with('success', 'Order updated successfully.');
+            $order->products()->detach();
+            $this->attachProductsToOrder($order, $productsId, $colorsId, $sizes, $quantities, $isDone);
+
+            return redirect()->back()->with('success', 'Order updated successfully.');
+        } catch (\Exception $exception) {
+            Log::error('Error in OrderController@update: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while updating the order. Please try again later.');
+        }
     }
 
     /**
@@ -200,12 +170,75 @@ class OrderController extends Controller
         try {
             if ($order->delete()) {
                 return redirect()->back()->with('success', 'Order deleted successfully.');
-            } else {
-                return redirect()->back()->with('error', 'Failed to delete order.');
             }
+            return redirect()->back()->with('error', 'Failed to delete order.');
         } catch (\Exception $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
+            Log::error('Error in OrderController@destroy: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while deleting the order. Please try again later.');
         }
     }
 
+    /**
+     * Validate that all arrays have the same length
+     */
+    private function validateArrays($data): bool
+    {
+        $arrays = ['products', 'colors', 'quantities', 'sizes'];
+        $length = count($data['products']);
+
+        foreach ($arrays as $array) {
+            if (!isset($data[$array]) || count($data[$array]) !== $length) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Calculate product quantities
+     */
+    private function calculateProductQuantities($productsId, $quantities): array
+    {
+        $productQuantity = [];
+        $sz = count($productsId);
+
+        for ($i = 0; $i < $sz; $i++) {
+            $productQuantity[$productsId[$i]]['quantity'] = 
+                ($productQuantity[$productsId[$i]]['quantity'] ?? 0) + $quantities[$i];
+        }
+
+        return $productQuantity;
+    }
+
+    /**
+     * Calculate total price
+     */
+    private function calculateTotalPrice($productsId, $productQuantity): float
+    {
+        $products = Product::whereIn('id', $productsId)->get();
+        $total_price = 0;
+
+        foreach ($products as $product) {
+            $total_price += $product->price * $productQuantity[$product->id]['quantity'];
+        }
+
+        return $total_price;
+    }
+
+    /**
+     * Attach products to order
+     */
+    private function attachProductsToOrder($order, $productsId, $colorsId, $sizes, $quantities, $isDone): void
+    {
+        $sz = count($productsId);
+        for ($i = 0; $i < $sz; $i++) {
+            $order->products()->attach($productsId[$i], [
+                "color_id"   => $colorsId[$i],
+                "size"       => $sizes[$i],
+                "quantity"   => $quantities[$i],
+                "is_done"    => !empty($isDone[$i]) ? 1 : 0,
+            ]);
+        }
+    }
 }

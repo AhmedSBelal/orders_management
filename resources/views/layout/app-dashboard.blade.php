@@ -1,41 +1,27 @@
-<!--
-=========================================================
-* Soft UI Dashboard 3 - v1.1.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://www.creative-tim.com/license)
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
--->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="{{asset('assets/img/apple-icon.png')}}">
-    <link rel="icon" type="image/png" href="{{asset('assets/img/favicon.png')}}">
+    <meta name="description" content="Order Management System">
+    <meta name="author" content="Agyad Maka">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{asset('media/agyad_maka.jpeg')}}">
+    <link rel="icon" type="image/jpeg" sizes="32x32" href="{{asset('media/agyad_maka.jpeg')}}">
+    <link rel="icon" type="image/jpeg" sizes="16x16" href="{{asset('media/agyad_maka.jpeg')}}">
+    <link rel="manifest" href="{{asset('media/site.webmanifest')}}">
+    <meta name="theme-color" content="#ffffff">
+    
     <title>
         @yield('title')
     </title>
-    <!--     Fonts and icons     -->
-{{--    <link href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,800" rel="stylesheet" />--}}
-    <!-- Nucleo Icons -->
-{{--    <link href="https://demos.creative-tim.com/soft-ui-dashboard/assets/css/nucleo-icons.css" rel="stylesheet" />--}}
-{{--    <link href="https://demos.creative-tim.com/soft-ui-dashboard/assets/css/nucleo-svg.css" rel="stylesheet" />--}}
-    <!-- Font Awesome Icons -->
-{{--    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>--}}
-    <!-- CSS Files -->
+
     <link id="pagestyle" href="{{asset('assets/css/soft-ui-dashboard.css?v=1.1.0')}}" rel="stylesheet" />
-    <!-- Nepcha Analytics (nepcha.com) -->
-    <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
-{{--    <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>--}}
-@yield('css')
+    
+    @yield('css')
 </head>
 
 
@@ -47,7 +33,7 @@
     <div class="sidenav-header">
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute start-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
         <a class="navbar-brand m-0" href="" target="_blank">
-            <img src="{{asset('assets/img/logo-ct-dark.png')}}" class="navbar-brand-img h-100" alt="main_logo">
+            <img src="{{asset('media/agyad_maka.jpeg')}}" class="navbar-brand-img h-100" alt="main_logo">
             <span class="me-1 font-weight-bold">{{Str::limit(Auth::user()->f_name . ' ' .  Auth()->user()->l_name, 20)}}</span>
         </a>
     </div>
@@ -690,9 +676,6 @@
         Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
 </script>
-<!-- Github buttons -->
-{{--<script async defer src="https://buttons.github.io/buttons.js"></script>--}}
-<!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
 <script src="{{asset('assets/js/soft-ui-dashboard.min.js?v=1.1.0')}}"></script>
 @yield('js')
 </body>
