@@ -83,7 +83,7 @@ class Order extends Model
             $orders->whereDate('created_at', $request->updated_at);
         }
 
-        return $orders->get();
+        return $orders->paginate(10);
 
     }
 
