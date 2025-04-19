@@ -49,6 +49,9 @@ class OrderController extends Controller
         $colorsId = $data['colors'];
         $quantities = $data['quantities'];
         $sizes = $data['sizes'];
+        if (empty($data['is_done'])) {
+            $data['is_done'] = [];
+        }
         $isDone = $data['is_done'];
 
         $productQuantity = [];
@@ -182,7 +185,7 @@ class OrderController extends Controller
                 "color_id"   => $colorsId[$i],
                 "size"       => $sizes[$i],
                 "quantity"   => $quantities[$i],
-                "is_done"    => $isDone[$i],
+                "is_done"    => !empty($isDone[$i]) ? 1 : 0,
             ]);
         }
 
