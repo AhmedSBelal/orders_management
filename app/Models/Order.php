@@ -24,7 +24,9 @@ class Order extends Model
         'total_price',
         'status',
         'come_from',
-        'payment_status'
+        'payment_status',
+        'notes',
+        'total_price_after_discount',
     ];
 
     // relations

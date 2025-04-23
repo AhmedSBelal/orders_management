@@ -2,7 +2,7 @@
 
 @section('title', $title)
 
-@section('css')
+@push('css')
     <style>
         .hidden {
             display: none;
@@ -290,7 +290,7 @@
         .table .deposit-column { width: 100px; min-width: 100px; }
         .table .actions-column { width: 200px; min-width: 200px; }
     </style>
-@endsection
+@endpush
 
 @section('content')
     <!-- Modal Structure -->
@@ -452,12 +452,12 @@
                                 <thead>
                                     <tr>
                                         <th class="number-column">الرقم</th>
-                                        <th class="location-column">العنوان</th>
                                         <th class="name-column">اسم المرسل اليه</th>
+                                        <th class="location-column">العنوان</th>
                                         <th class="phone-column">رقم الهاتف</th>
                                         <th class="status-column">حالة الطلب</th>
                                         <th class="price-column">السعر</th>
-                                        <th class="deposit-column">المقدم</th>
+                                        {{-- <th class="deposit-column">المقدم</th> --}}
                                         <th class="actions-column">عمليات على الطلب</th>
                                     </tr>
                                 </thead>
@@ -465,8 +465,8 @@
                                     @forelse($orders as $order)
                                         <tr>
                                             <td class="number-column">{{$loop->iteration}}</td>
-                                            <td class="location-column">{{Str::limit($order->location, 20)}}</td>
                                             <td class="name-column">{{Str::limit($order->client_name, 20)}}</td>
+                                             <td class="location-column">{{Str::limit($order->location, 20)}}</td>
                                             <td class="phone-column">{{Str::limit($order->client_phone, 20)}}</td>
                                             <td class="status-column">
                                                 <span class="status-badge status-{{ str_replace(' ', '-', $order->status) }}">
@@ -474,7 +474,7 @@
                                                 </span>
                                             </td>
                                             <td class="price-column">{{$order->total_price}}</td>
-                                            <td class="deposit-column">{{$order->deposited}}</td>
+                                            {{-- <td class="deposit-column">{{$order->deposited}}</td> --}}
                                             <td class="actions-column">
                                                 <div class="action-buttons">
                                                     <a class="btn btn-success" href="{{route('orders.edit', $order->id)}}" title="Edit Order">
@@ -509,7 +509,7 @@
     </div>
 @endsection
 
-@section('js')
+@push('js')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let deleteFormId = null;
@@ -610,5 +610,4 @@
             window.addEventListener('resize', handleResponsiveTable);
         });
     </script>
-@endsection
-{{-- @stop --}}
+@endpush
