@@ -46,10 +46,11 @@ class OrderController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage.OrderCreateRequest
      */
     public function store(OrderCreateRequest $request)
     {
+        // dd($request->all());
         try {
             $data = $request->validated();
             
@@ -73,10 +74,12 @@ class OrderController extends Controller
                 'client_phone' => $data['client_phone'],
                 'city'         => $data['city'],
                 // 'post_office'  => $data['post_office'],
-                'deposited'    => $data['deposited'],
+                'deposited'    => $data['deposited'] ?? 0,
                 'total_price'  => $total_price,
                 'status'       => $data['status'],
                 'come_from'    => $data['come_from'],
+                'total_price_after_discount' => $data['total_price_after_discount'] ?? 0,
+                'notes'        => $data['notes'],
             ]);
 
             $this->attachProductsToOrder($order, $productsId, $colorsId, $sizes, $quantities, $isDone);
@@ -123,6 +126,7 @@ class OrderController extends Controller
      */
     public function update(OrderUpdateRequest $request, Order $order)
     {
+        // dd($request->all());
         try {
             $data = $request->validated();
             
@@ -145,16 +149,18 @@ class OrderController extends Controller
                 'client_phone' => $data['client_phone'],
                 'city'         => $data['city'],
                 // 'post_office'  => $data['post_office'],
-                'deposited'    => $data['deposited'],
+                'deposited'    => $data['deposited'] ?? 0,
                 'total_price'  => $total_price,
                 'status'       => $data['status'],
                 'come_from'    => $data['come_from'],
-                'payment_status' => $data['payment_status'],
+                // 'payment_status' => $data['payment_status'],
+                'total_price_after_discount' => $data['total_price_after_discount'] ?? 0,
+                'notes'        => $data['notes'] ?? null,
             ]);
 
             $order->products()->detach();
             $this->attachProductsToOrder($order, $productsId, $colorsId, $sizes, $quantities, $isDone);
-
+// dd($request->all());
             return redirect()->back()->with('success', 'Order updated successfully.');
         } catch (\Exception $exception) {
             Log::error('Error in OrderController@update: ' . $exception->getMessage());

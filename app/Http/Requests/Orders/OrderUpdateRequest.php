@@ -28,10 +28,10 @@ class OrderUpdateRequest extends FormRequest
             "location"     => "required|string|max:255|min:3",
             "client_name"  => "required|string|max:255|min:3",
             "status"       => ['required', Rule::in(OrderStatuses::values())],
-            "client_phone" => "string|max:255|min:3|nullable",
-            "city"         => "string|max:255|min:3|required",
+            "client_phone" => "required|string|max:255|min:3",
+            "city"         => "required|string|max:255|min:3",
             // "post_office"  => "string|max:255|min:3|required",
-            "deposited"    => "nullable|integer",
+            "deposited"    => "nullable|integer|min:0",
             "come_from"    => "nullable|string|max:255|min:3",
             "payment_status" => ['nullable', Rule::in(PaymentStatus::values())],
             "products"     => "array",
@@ -42,8 +42,10 @@ class OrderUpdateRequest extends FormRequest
             "sizes.*"      => "numeric",
             "quantities"   => "array",
             "quantities.*" => "integer",
-            'is_done'      => "array",
-            "is_done.*"    => "boolean",
+            "is_done"      => "nullable|array",
+            "is_done.*"    => "nullable|boolean",
+            "notes"        => "nullable|string|max:255|min:3",
+            "total_price_after_discount" => "nullable|numeric|min:0",
         ];
     }
 }

@@ -21,7 +21,7 @@
 
     <link id="pagestyle" href="{{asset('assets/css/soft-ui-dashboard.css?v=1.1.0')}}" rel="stylesheet" />
     
-    @yield('css')
+    @stack('css')
 </head>
 
 
@@ -220,7 +220,7 @@
     </nav>
     <!-- End Navbar -->
 
-    @if($errors->any())
+    {{-- @if($errors->any())
         <div class="alert alert-danger">
             <ul>
                 @foreach($errors->all() as $error)
@@ -228,13 +228,13 @@
                 @endforeach
             </ul>
         </div>
-    @endif
+    @endif --}}
 
-    @if(Session::has('success'))
+    {{-- @if(Session::has('success'))
         <div class="row">
             <p class="alert alert-info">{{ Session::get('success') }}</p>
         </div>
-    @endif
+    @endif --}}
 
 
     @yield('content')
@@ -677,7 +677,7 @@
     }
 </script>
 <script src="{{asset('assets/js/soft-ui-dashboard.min.js?v=1.1.0')}}"></script>
-@yield('js')
+@stack('js')
 </body>
 
 </html>

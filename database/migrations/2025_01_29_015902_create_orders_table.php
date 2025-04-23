@@ -16,14 +16,16 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('location');
             $table->string('client_name');
-            $table->string('client_phone')->nullable();
-            $table->string('city')->nullable();
+            $table->string('client_phone');
+            $table->string('city');
             $table->string('post_office')->nullable();
-            $table->float('deposited');
+            $table->float('deposited')->default(0);
             $table->float('total_price');
             $table->string('status')->default(\App\Enums\OrderStatuses::InProcessing);
             $table->string('come_from')->nullable();
-            $table->string('payment_status')->nullable()->default(\App\Enums\PaymentStatus::WaitPaid);
+            $table->string('payment_status')->default(\App\Enums\PaymentStatus::WaitPaid);
+            $table->text('notes')->nullable();
+            $table->float('total_price_after_discount')->default(0);
             $table->timestamps();
         });
     }

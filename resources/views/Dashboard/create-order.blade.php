@@ -2,7 +2,7 @@
 
 @section('title', $title)
 
-@section('css')
+@push('css')
     <style>
         #productTable {
             margin-bottom: 15px;
@@ -51,7 +51,7 @@
             text-align: left !important;
         }
     </style>
-@endsection
+@endpush
 
 @section('content')
 <div class="container-fluid py-4">
@@ -61,6 +61,7 @@
                 <div class="card-header">
                     <div class="card-title">Add New Order</div>
                 </div>
+                @include('layout.messages')
                 <form action="{{route('orders.store')}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
@@ -104,8 +105,8 @@
                             </div>
 
                             <div class="mb-3 col-md-6 col-12">
-                                <label class="form-label">رقم الهاتف</label>
-                                <input type="text" class="form-control" name="client_phone" placeholder="رقم الهاتف" value="{{old('client_phone')}}">
+                                <label class="form-label">رقم الهاتف <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="client_phone" placeholder="رقم الهاتف" value="{{old('client_phone')}}" required>
                                 @error('client_phone')
                                     <div class="text-danger">
                                         {{$message}}
@@ -114,8 +115,8 @@
                             </div>
 
                             <div class="mb-3 col-md-6 col-12">
-                                <label class="form-label">المحافظه</label>
-                                <input type="text" class="form-control" name="city" placeholder="المحافظه" value="{{old('city')}}">
+                                <label class="form-label">المحافظه <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="city" placeholder="المحافظه" value="{{old('city')}}" required>
                                 @error('city')
                                     <div class="text-danger">
                                         {{$message}}
@@ -154,6 +155,25 @@
                             </div>
 
                             <div class="mb-3 col-md-6 col-12">
+                                <label class="form-label">المبلغ بعد الخصم</label>
+                                <input type="number" class="form-control" name="total_price_after_discount" placeholder="المبلغ بعد الخصم" value="{{old('total_price_after_discount', 0)}}" step="0.001" min="0"">
+                                @error('total_price_after_discount')
+                                    <div class="text-danger">
+                                        {{$message}}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3 col-md-12">
+                                <label class="form-label">ملاحظات</label>
+                                <textarea class="form-control" name="notes" placeholder="أضف ملاحظاتك هنا">{{ old('notes') }}</textarea>
+                                @error('notes')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+
+                            {{-- <div class="mb-3 col-md-6 col-12">
                                 <label class="form-label">حالة دفع الطلب</label>
                                 <select name="payment_status" class="form-control">
                                     <option value="">حالة دفع الطلب</option>
@@ -167,7 +187,7 @@
                                     </div>
                                 @enderror
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="mb-3 col-12">
                             <label class="form-label">Products and Colors</label>
@@ -232,38 +252,47 @@
 </div>
 @endsection
 
-@section('js')
-    <script>
-        document.getElementById('addRow').addEventListener('click', function () {
-            const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
-            const newRow = table.rows[table.rows.length - 1].cloneNode(true);
+@push('js')
+<script>
+    document.getElementById('addRow').addEventListener('click', function () {
+        const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+        const lastRow = table.rows[table.rows.length - 1];
+        const newRow = lastRow.cloneNode(true);
 
-            let inputElement = newRow.children[4].children[0].children[0];
-            let match = inputElement.name.match(/\d+/);
-            let index = match ? parseInt(match[0]) + 1 : 0;
+        // Get values from last row
+        const lastColor = lastRow.querySelector('.color-select').value;
+        const lastSize = lastRow.querySelector('input[name="sizes[]"]').value;
+        const lastQuantity = lastRow.querySelector('input[name="quantities[]"]').value;
 
-            inputElement.name = `is_done[${index}]`;
-            newRow.children[4].children[0].children[0] = inputElement;
+        // Clear product selection but keep color and size
+        newRow.querySelector('.product-select').selectedIndex = 0;
+        newRow.querySelector('.color-select').value = lastColor;
+        newRow.querySelector('input[name="sizes[]"]').value = lastSize;
+        newRow.querySelector('input[name="quantities[]"]').value = lastQuantity || 1; // Default to 1 if empty
+        
+        // Reset the done checkbox
+        const checkbox = newRow.querySelector('input[type="checkbox"]');
+        checkbox.checked = false;
+        
+        // Update is_done checkbox index
+        let match = checkbox.name.match(/\d+/);
+        let index = match ? parseInt(match[0]) + 1 : 0;
+        checkbox.name = `is_done[${index}]`;
 
-            newRow.querySelector('.product-select').selectedIndex = 0;
-            newRow.querySelector('.color-select').selectedIndex = 0;
-            newRow.querySelector('input[name="quantities[]"]').value = 1;
+        table.appendChild(newRow);
+    });
 
-            const checkboxInput = newRow.querySelector('input[type="checkbox"]');
-            checkboxInput.checked = false;
-
-            table.appendChild(newRow);
-        });
-
-        document.addEventListener('click', function (event) {
-            if (event.target.classList.contains('remove-row')) {
-                const row = event.target.closest('tr');
-                if (document.getElementById('productTable').getElementsByTagName('tbody')[0].rows.length > 1) {
-                    row.remove();
-                } else {
-                    alert("You cannot remove the last row.");
-                }
+    // Remove row functionality
+    document.addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('remove-row')) {
+            const tableBody = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+            if (tableBody.rows.length > 1) {
+                event.target.closest('tr').remove();
+            } else {
+                alert('At least one row is required.');
             }
-        });
-    </script>
-@endsection
+        }
+    });
+</script>
+@endpush
+
