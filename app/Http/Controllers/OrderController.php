@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Orders\OrderCreateRequest;
-use App\Http\Requests\Orders\OrdersFilterRequest;
-use App\Http\Requests\Orders\OrderUpdateRequest;
 use App\Models\Color;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Orders\OrderCreateRequest;
+use App\Http\Requests\Orders\OrderUpdateRequest;
+use App\Http\Requests\Orders\OrdersFilterRequest;
+use App\Http\Requests\Orders\BulkUpdateStatusRequest;
 
 class OrderController extends Controller
 {
@@ -20,8 +21,16 @@ class OrderController extends Controller
     {
         try {
             $title = 'Dashboard - Orders';
-            $orders = Order::ordersByFilter($request);
-            // $orders = $orders->paginate(10);
+
+            // This now receives a QueryBuilder instance from the model
+            $ordersQuery = Order::ordersByFilter($request);
+
+            // Get the number of items per page from the request, defaulting to 10
+            $perPage = $request->get('per_page', 10);
+
+            // Execute the query with pagination and append all query parameters to the pagination links
+            $orders = $ordersQuery->paginate($perPage)->appends($request->query());
+
             return view('Dashboard.index', compact('orders', 'title'));
         } catch (\Exception $exception) {
             Log::error('Error in OrderController@index: ' . $exception->getMessage());
@@ -53,7 +62,7 @@ class OrderController extends Controller
         // dd($request->all());
         try {
             $data = $request->validated();
-            
+
             if (!$this->validateArrays($data)) {
                 return redirect()->back()->with('error', 'Invalid product data. Please check your input.');
             }
@@ -68,18 +77,18 @@ class OrderController extends Controller
             $total_price = $this->calculateTotalPrice($productsId, $productQuantity);
 
             $order = Order::create([
-                'user_id'      => auth()->id(),
-                'location'     => $data['location'],
-                'client_name'  => $data['client_name'],
+                'user_id' => auth()->id(),
+                'location' => $data['location'],
+                'client_name' => $data['client_name'],
                 'client_phone' => $data['client_phone'],
-                'city'         => $data['city'],
+                'city' => $data['city'],
                 // 'post_office'  => $data['post_office'],
-                'deposited'    => $data['deposited'] ?? 0,
-                'total_price'  => $total_price,
-                'status'       => $data['status'],
-                'come_from'    => $data['come_from'],
+                'deposited' => $data['deposited'] ?? 0,
+                'total_price' => $total_price,
+                'status' => $data['status'],
+                'come_from' => $data['come_from'],
                 'total_price_after_discount' => $data['total_price_after_discount'] ?? 0,
-                'notes'        => $data['notes'],
+                'notes' => $data['notes'],
             ]);
 
             $this->attachProductsToOrder($order, $productsId, $colorsId, $sizes, $quantities, $isDone);
@@ -101,7 +110,7 @@ class OrderController extends Controller
             $colors = Color::all();
             $productsData = Product::all();
             $products = $order->products()->get();
-            
+
             $products = $products->map(function ($product) {
                 return [
                     'id' => $product->id,
@@ -129,7 +138,7 @@ class OrderController extends Controller
         // dd($request->all());
         try {
             $data = $request->validated();
-            
+
             if (!$this->validateArrays($data)) {
                 return redirect()->back()->with('error', 'Invalid product data. Please check your input.');
             }
@@ -144,23 +153,23 @@ class OrderController extends Controller
             $total_price = $this->calculateTotalPrice($productsId, $productQuantity);
 
             $order->update([
-                'location'     => $data['location'],
-                'client_name'  => $data['client_name'],
+                'location' => $data['location'],
+                'client_name' => $data['client_name'],
                 'client_phone' => $data['client_phone'],
-                'city'         => $data['city'],
+                'city' => $data['city'],
                 // 'post_office'  => $data['post_office'],
-                'deposited'    => $data['deposited'] ?? 0,
-                'total_price'  => $total_price,
-                'status'       => $data['status'],
-                'come_from'    => $data['come_from'],
+                'deposited' => $data['deposited'] ?? 0,
+                'total_price' => $total_price,
+                'status' => $data['status'],
+                'come_from' => $data['come_from'],
                 // 'payment_status' => $data['payment_status'],
                 'total_price_after_discount' => $data['total_price_after_discount'] ?? 0,
-                'notes'        => $data['notes'] ?? null,
+                'notes' => $data['notes'] ?? null,
             ]);
 
             $order->products()->detach();
             $this->attachProductsToOrder($order, $productsId, $colorsId, $sizes, $quantities, $isDone);
-// dd($request->all());
+            // dd($request->all());
             return redirect()->back()->with('success', 'Order updated successfully.');
         } catch (\Exception $exception) {
             Log::error('Error in OrderController@update: ' . $exception->getMessage());
@@ -210,7 +219,7 @@ class OrderController extends Controller
         $sz = count($productsId);
 
         for ($i = 0; $i < $sz; $i++) {
-            $productQuantity[$productsId[$i]]['quantity'] = 
+            $productQuantity[$productsId[$i]]['quantity'] =
                 ($productQuantity[$productsId[$i]]['quantity'] ?? 0) + $quantities[$i];
         }
 
@@ -240,11 +249,32 @@ class OrderController extends Controller
         $sz = count($productsId);
         for ($i = 0; $i < $sz; $i++) {
             $order->products()->attach($productsId[$i], [
-                "color_id"   => $colorsId[$i],
-                "size"       => $sizes[$i],
-                "quantity"   => $quantities[$i],
-                "is_done"    => !empty($isDone[$i]) ? 1 : 0,
+                "color_id" => $colorsId[$i],
+                "size" => $sizes[$i],
+                "quantity" => $quantities[$i],
+                "is_done" => !empty($isDone[$i]) ? 1 : 0,
             ]);
         }
     }
+
+    /**
+     * Update the status of multiple orders.
+     */
+    public function bulkUpdateStatus(BulkUpdateStatusRequest $request)
+    {
+        try {
+            // Validation is now handled automatically by BulkUpdateStatusRequest
+
+            $orderIds = $request->input('order_ids');
+            $newStatus = $request->input('status');
+
+            Order::whereIn('id', $orderIds)->update(['status' => $newStatus]);
+
+            return redirect()->back()->with('success', 'Order status updated successfully.');
+        } catch (\Exception $exception) {
+            Log::error('Error in OrderController@bulkUpdateStatus: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while updating order status. Please try again later.');
+        }
+    }
+
 }

@@ -25,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
 
     // orders
     Route::resource('orders', \App\Http\Controllers\OrderController::class);
+    Route::post('orders/bulk-update-status', [\App\Http\Controllers\OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
     Route::get('in-processing', [HomeController::class, 'inProcessing'])->name('in-processing');
 
     Route::resource('products', \App\Http\Controllers\ProductController::class);

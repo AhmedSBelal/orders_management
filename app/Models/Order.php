@@ -30,19 +30,22 @@ class Order extends Model
     ];
 
     // relations
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function products(): BelongsToMany {
-        return $this->belongsToMany( Product::class, 'order_product', 'order_id')
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'order_product', 'order_id')
             ->withPivot('color_id', 'quantity', 'size', 'is_done'); // Include pivot columns;
     }
 
     // filter
 
-    static function ordersByFilter(OrdersFilterRequest $request) {
-
+    static function ordersByFilter(OrdersFilterRequest $request)
+    {
+        // Start with a query builder instance
         $orders = self::query();
 
         if (!empty($request->location)) {
@@ -69,24 +72,26 @@ class Order extends Model
             $orders->where('deposited', 'like', '%' . $request->deposited . '%');
         }
 
-        if(!empty($request->come_from)){
-            $orders->where('come_from', 'like','%' . $request->come_from . '%');
+        if (!empty($request->come_from)) {
+            $orders->where('come_from', 'like', '%' . $request->come_from . '%');
         }
 
         if (!empty($request->payment_status)) {
             $orders->where('payment_status', $request->payment_status);
         }
 
-        if(!empty($request->created_at)){
+        if (!empty($request->created_at)) {
             $orders->whereDate('created_at', $request->created_at);
         }
 
-        if(!empty($request->updated_at)){
-            $orders->whereDate('created_at', $request->updated_at);
+        // FIX 1: Corrected the column name from 'created_at' to 'updated_at'
+        if (!empty($request->updated_at)) {
+            $orders->whereDate('updated_at', $request->updated_at);
         }
 
-        return $orders->paginate(10);
-
+        // FIX 2: Return the query builder instance itself, NOT the paginated results.
+        // Remove ->paginate(10) from here.
+        return $orders;
     }
 
 }

@@ -39,7 +39,7 @@
 
         .search-form .form-control:focus {
             border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
         }
 
         .table-responsive {
@@ -154,7 +154,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @media (max-width: 768px) {
@@ -169,7 +171,7 @@
             .table-responsive {
                 margin: 0;
             }
-            
+
             .table {
                 min-width: 1000px;
             }
@@ -230,7 +232,7 @@
             .pagination {
                 flex-wrap: wrap;
             }
-            
+
             .pagination .page-link {
                 padding: 0.375rem 0.75rem;
                 min-width: 2rem;
@@ -281,20 +283,85 @@
         }
 
         /* Column specific widths */
-        .table .number-column { width: 80px; min-width: 80px; }
-        .table .location-column { width: 150px; min-width: 150px; }
-        .table .name-column { width: 150px; min-width: 150px; }
-        .table .phone-column { width: 120px; min-width: 120px; }
-        .table .status-column { width: 120px; min-width: 120px; }
-        .table .price-column { width: 100px; min-width: 100px; }
-        .table .deposit-column { width: 100px; min-width: 100px; }
-        .table .actions-column { width: 200px; min-width: 200px; }
+        .table .number-column {
+            width: 80px;
+            min-width: 80px;
+        }
+
+        .table .checkbox-column {
+            width: 50px;
+            min-width: 50px;
+        }
+
+        .table .location-column {
+            width: 150px;
+            min-width: 150px;
+        }
+
+        .table .name-column {
+            width: 150px;
+            min-width: 150px;
+        }
+
+        .table .phone-column {
+            width: 120px;
+            min-width: 120px;
+        }
+
+        .table .status-column {
+            width: 120px;
+            min-width: 120px;
+        }
+
+        .table .price-column {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .table .deposit-column {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .table .actions-column {
+            width: 200px;
+            min-width: 200px;
+        }
+
+        /* Bulk actions styles */
+        .bulk-actions {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .bulk-actions.show {
+            display: block;
+        }
+
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .selected-count {
+            background-color: #0d6efd;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+        }
     </style>
 @endpush
 
 @section('content')
     <!-- Modal Structure -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -369,21 +436,24 @@
                     <div class="card-header">
                         <h3 class="card-title">Search Order</h3>
                     </div>
-                    <form action="" method="GET" id="searchForm">
+                    <form action="{{ route('orders.index') }}" method="GET" id="searchForm">
                         @csrf
                         <div class="card-body search-form">
                             <div class="row">
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">اسم المرسل اليه</label>
-                                    <input type="text" class="form-control" name="client_name" placeholder="اسم المرسل اليه" value="{{request('client_name')}}">
+                                    <input type="text" class="form-control" name="client_name" placeholder="اسم المرسل اليه"
+                                        value="{{request('client_name')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">العنوان</label>
-                                    <input type="text" class="form-control" name="location" placeholder="العنوان" value="{{request('location')}}">
+                                    <input type="text" class="form-control" name="location" placeholder="العنوان"
+                                        value="{{request('location')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">رقم الهاتف</label>
-                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم الهاتف" value="{{request('client_phone')}}">
+                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم الهاتف"
+                                        value="{{request('client_phone')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">حالة الطلب</label>
@@ -398,15 +468,18 @@
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">السعر</label>
-                                    <input type="text" class="form-control" name="total_price" placeholder="السعر" value="{{request('total_price')}}">
+                                    <input type="text" class="form-control" name="total_price" placeholder="السعر"
+                                        value="{{request('total_price')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">المقدم</label>
-                                    <input type="text" class="form-control" name="deposited" placeholder="المقدم" value="{{request('deposited')}}">
+                                    <input type="text" class="form-control" name="deposited" placeholder="المقدم"
+                                        value="{{request('deposited')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">جاى عن طريق</label>
-                                    <input type="text" class="form-control" name="come_from" placeholder="جاى عن طريق" value="{{request('come_from')}}">
+                                    <input type="text" class="form-control" name="come_from" placeholder="جاى عن طريق"
+                                        value="{{request('come_from')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">حالة دفع الطلب</label>
@@ -419,11 +492,13 @@
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">تاريخ الاضافة</label>
-                                    <input type="date" class="form-control" name="created_at" value="{{request('created_at')}}">
+                                    <input type="date" class="form-control" name="created_at"
+                                        value="{{request('created_at')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">تاريخ التعديل</label>
-                                    <input type="date" class="form-control" name="updated_at" value="{{request('updated_at')}}">
+                                    <input type="date" class="form-control" name="updated_at"
+                                        value="{{request('updated_at')}}">
                                 </div>
                                 <div class="form-group col-md-3 mb-3 d-flex align-items-end gap-2">
                                     <button class="btn btn-primary" type="submit" id="searchButton">
@@ -436,6 +511,21 @@
                             </div>
                         </div>
                     </form>
+
+                    <!-- Results per page dropdown -->
+                    <div class="card-body search-form">
+                        <div class="row">
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">Results per page</label>
+                                <select name="per_page" id="perPage" class="form-control" onchange="changePerPage()">
+                                    <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -446,27 +536,64 @@
                     <div class="card-header pb-0">
                         <h6>Orders Table</h6>
                     </div>
+
+                    <!-- Bulk Actions Form -->
+                    <div class="bulk-actions" id="bulkActions">
+                        <form action="{{ route('orders.bulk-update-status') }}" method="POST" id="bulkUpdateForm">
+                            @csrf
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <span>Selected: <span class="selected-count" id="selectedCount">0</span> orders</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <select name="status" class="form-control" required>
+                                        <option value="">Change status to</option>
+                                        @foreach(\App\Enums\OrderStatuses::cases() as $status)
+                                            <option value="{{ $status->value }}">{{ $status->value }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-sync-alt me-2"></i>Update Status
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="clearSelection">
+                                        <i class="fas fa-times me-2"></i>Clear Selection
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- THE FIX IS HERE: Added [] to the name attribute -->
+                            <div id="selectedOrderIdsContainer"></div>
+                        </form>
+                    </div>
+
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive">
                             <table class="table align-items-center mb-0">
                                 <thead>
                                     <tr>
+                                        <th class="checkbox-column">
+                                            <input type="checkbox" class="custom-checkbox" id="selectAll">
+                                        </th>
                                         <th class="number-column">الرقم</th>
                                         <th class="name-column">اسم المرسل اليه</th>
                                         <th class="location-column">العنوان</th>
                                         <th class="phone-column">رقم الهاتف</th>
                                         <th class="status-column">حالة الطلب</th>
                                         <th class="price-column">السعر</th>
-                                        {{-- <th class="deposit-column">المقدم</th> --}}
                                         <th class="actions-column">عمليات على الطلب</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($orders as $order)
                                         <tr>
-                                            <td class="number-column">{{$loop->iteration}}</td>
+                                            <td class="checkbox-column">
+                                                <input type="checkbox" class="custom-checkbox order-checkbox"
+                                                    value="{{ $order->id }}">
+                                            </td>
+                                            <td class="number-column">{{$orders->firstItem() + $loop->index}}</td>
                                             <td class="name-column">{{Str::limit($order->client_name, 20)}}</td>
-                                             <td class="location-column">{{Str::limit($order->location, 20)}}</td>
+                                            <td class="location-column">{{Str::limit($order->location, 20)}}</td>
                                             <td class="phone-column">{{Str::limit($order->client_phone, 20)}}</td>
                                             <td class="status-column">
                                                 <span class="status-badge status-{{ str_replace(' ', '-', $order->status) }}">
@@ -474,13 +601,14 @@
                                                 </span>
                                             </td>
                                             <td class="price-column">{{$order->total_price}}</td>
-                                            {{-- <td class="deposit-column">{{$order->deposited}}</td> --}}
                                             <td class="actions-column">
                                                 <div class="action-buttons">
-                                                    <a class="btn btn-success" href="{{route('orders.edit', $order->id)}}" title="Edit Order">
+                                                    <a class="btn btn-success" href="{{route('orders.edit', $order->id)}}"
+                                                        title="Edit Order">
                                                         <i class="fas fa-edit"></i> Edit
                                                     </a>
-                                                    <button type="button" class="btn btn-danger delete-btn" data-order-id="{{ $order->id }}" title="Delete Order">
+                                                    <button type="button" class="btn btn-danger delete-btn"
+                                                        data-order-id="{{ $order->id }}" title="Delete Order">
                                                         <i class="fas fa-trash"></i> حذف
                                                     </button>
                                                 </div>
@@ -511,10 +639,11 @@
 
 @push('js')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             let deleteFormId = null;
             let deleteForm = null;
             let confirmationModal = null;
+            let selectedOrders = new Set();
 
             // Initialize the modal
             const modalElement = document.getElementById('confirmationModal');
@@ -535,7 +664,6 @@
                     csrfToken.type = 'hidden';
                     csrfToken.name = '_token';
                     csrfToken.value = "{{ csrf_token() }}";
-                    document.querySelector('meta[name="csrf-token"]').content;
                     deleteForm.appendChild(csrfToken);
 
                     // Add method override for DELETE
@@ -548,7 +676,7 @@
             }
 
             // Handle delete button clicks
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 if (e.target.closest('.delete-btn')) {
                     const orderId = e.target.closest('.delete-btn').dataset.orderId;
                     showConfirmationModal(orderId);
@@ -561,14 +689,14 @@
                 createDeleteForm();
                 // Set the correct route for deletion
                 deleteForm.action = `/orders/${orderId}`;
-                
+
                 if (confirmationModal) {
                     confirmationModal.show();
                 }
             }
 
             // Handle confirm delete button click
-            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
                 if (deleteFormId !== null && deleteForm) {
                     deleteForm.submit();
                 }
@@ -577,7 +705,7 @@
             // Add loading state to search form
             const searchForm = document.getElementById('searchForm');
             if (searchForm) {
-                searchForm.addEventListener('submit', function(e) {
+                searchForm.addEventListener('submit', function (e) {
                     const searchButton = document.getElementById('searchButton');
                     if (searchButton) {
                         searchButton.classList.add('loading');
@@ -608,6 +736,118 @@
 
             // Add event listener for window resize
             window.addEventListener('resize', handleResponsiveTable);
+
+            // Bulk selection functionality
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const orderCheckboxes = document.querySelectorAll('.order-checkbox');
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            const selectedOrderIds = document.getElementById('selectedOrderIds');
+            const clearSelectionBtn = document.getElementById('clearSelection');
+
+            // Handle select all checkbox
+            selectAllCheckbox.addEventListener('change', function () {
+                const isChecked = this.checked;
+
+                orderCheckboxes.forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                    const orderId = parseInt(checkbox.value);
+
+                    if (isChecked) {
+                        selectedOrders.add(orderId);
+                    } else {
+                        selectedOrders.delete(orderId);
+                    }
+                });
+
+                updateBulkActions();
+            });
+
+            // Handle individual order checkboxes
+            orderCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const orderId = parseInt(this.value);
+
+                    if (this.checked) {
+                        selectedOrders.add(orderId);
+                    } else {
+                        selectedOrders.delete(orderId);
+                    }
+
+                    updateBulkActions();
+                    updateSelectAllCheckbox();
+                });
+            });
+
+            // Update select all checkbox state
+            function updateSelectAllCheckbox() {
+                const totalCheckboxes = orderCheckboxes.length;
+                const checkedCheckboxes = document.querySelectorAll('.order-checkbox:checked').length;
+
+                selectAllCheckbox.checked = totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes;
+                selectAllCheckbox.indeterminate = checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes;
+            }
+
+            // Update bulk actions visibility and selected count
+            function updateBulkActions() {
+                const count = selectedOrders.size;
+                const container = document.getElementById('selectedOrderIdsContainer'); // Get the new container
+
+                // Clear any existing hidden inputs from previous selections
+                container.innerHTML = '';
+
+                if (count > 0) {
+                    bulkActions.classList.add('show');
+                    selectedCount.textContent = count;
+
+                    // Create a hidden input for EACH selected order ID
+                    selectedOrders.forEach(orderId => {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'order_ids[]'; // The [] is crucial!
+                        hiddenInput.value = orderId;
+                        container.appendChild(hiddenInput);
+                    });
+
+                } else {
+                    bulkActions.classList.remove('show');
+                }
+            }
+
+            // Clear selection
+            clearSelectionBtn.addEventListener('click', function () {
+                selectedOrders.clear();
+                orderCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                selectAllCheckbox.checked = false;
+                updateBulkActions();
+            });
+
+            // Handle bulk update form submission
+            const bulkUpdateForm = document.getElementById('bulkUpdateForm');
+            bulkUpdateForm.addEventListener('submit', function (e) {
+                if (selectedOrders.size === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one order to update.');
+                    return;
+                }
+
+                const statusSelect = this.querySelector('select[name="status"]');
+                if (!statusSelect.value) {
+                    e.preventDefault();
+                    alert('Please select a status to update.');
+                    return;
+                }
+            });
         });
+
+        // Function to change results per page
+        function changePerPage() {
+            const perPage = document.getElementById('perPage').value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('per_page', perPage);
+            window.location.href = url.toString();
+        }
     </script>
 @endpush
