@@ -27,10 +27,9 @@ class OrderUpdateRequest extends FormRequest
         return [
             "location"     => "required|string|max:255|min:3",
             "client_name"  => "required|string|max:255|min:3",
-            "status"       => ['required', Rule::in(OrderStatuses::values())],
+            "status_id"    => "required|exists:order_statuses,id",
             "client_phone" => "required|string|max:255|min:3",
             "city"         => "required|string|max:255|min:3",
-            // "post_office"  => "string|max:255|min:3|required",
             "deposited"    => "nullable|integer|min:0",
             "come_from"    => "nullable|string|max:255|min:3",
             "payment_status" => ['nullable', Rule::in(PaymentStatus::values())],
@@ -46,6 +45,14 @@ class OrderUpdateRequest extends FormRequest
             "is_done.*"    => "nullable|boolean",
             "notes"        => "nullable|string|max:255|min:3",
             "total_price_after_discount" => "nullable|numeric|min:0",
+            
+            // Image validation - now optional
+            "photos"       => "nullable|array|max:5",
+            "photos.*"     => "image|mimes:jpeg,png,jpg,gif|max:2048",
+            
+            // Validation for deleting existing images
+            "delete_images"   => "nullable|array",
+            "delete_images.*" => "integer|exists:order_images,id",
         ];
     }
 }

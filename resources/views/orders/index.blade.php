@@ -1,3 +1,4 @@
+{{-- resource/views/orders/index.blade.php --}}
 @extends('layout.app-dashboard')
 
 @section('title', $title)
@@ -356,12 +357,38 @@
             margin-left: 0.5rem;
         }
     </style>
+    <style>
+        /* 1. Set a fixed size for the table cell */
+        .image-column-fixed {
+            width: 120px;  /* Adjust the width as you need */
+            height: 120px; /* Adjust the height as you need */
+            vertical-align: middle; /* Vertically aligns the content */
+            text-align: center;     /* Horizontally aligns the content */
+        }
+
+        /* 2. Make the image fit inside the fixed cell without distortion */
+        .image-column-fixed img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* This is the key property! */
+            display: block; /* Removes extra space below the image */
+        }
+
+        /* Optional: Style the "no image" div to fit the cell */
+        .image-column-fixed .no-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            font-size: 0.8em;
+            color: #888;
+        }
+    </style>
 @endpush
 
 @section('content')
     <!-- Modal Structure -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -426,6 +453,27 @@
                     </div>
                 </div>
             </div>
+
+            <div class="col-lg-3 col-sm-6 mb-lg-0 mb-4">
+                <div class="card card-dashboard">
+                    <div class="card-body p-3">
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="numbers">
+                                    <p class="text-sm mb-0 text-capitalize font-weight-bold">إدارة الحالات</p>
+                                </div>
+                            </div>
+                            <div class="col-4 text-start">
+                                <a href="{{route('orders.statuses.index')}}">
+                                    <div class="icon icon-shape bg-primary shadow text-center border-radius-md">
+                                        <i class="fas fa-cogs text-white"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <br>
@@ -434,7 +482,7 @@
             <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-header">
-                        <h3 class="card-title">Search Order</h3>
+                        <h3 class="card-title">بحث عن طلبيات</h3>
                     </div>
                     <form action="{{ route('orders.index') }}" method="GET" id="searchForm">
                         @csrf
@@ -442,44 +490,38 @@
                             <div class="row">
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">اسم المرسل اليه</label>
-                                    <input type="text" class="form-control" name="client_name" placeholder="اسم المرسل اليه"
-                                        value="{{request('client_name')}}">
+                                    <input type="text" class="form-control" name="client_name" placeholder="اسم المرسل اليه" value="{{request('client_name')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">العنوان</label>
-                                    <input type="text" class="form-control" name="location" placeholder="العنوان"
-                                        value="{{request('location')}}">
+                                    <input type="text" class="form-control" name="location" placeholder="العنوان" value="{{request('location')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">رقم الهاتف</label>
-                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم الهاتف"
-                                        value="{{request('client_phone')}}">
+                                    <input type="text" class="form-control" name="client_phone" placeholder="رقم الهاتف" value="{{request('client_phone')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">حالة الطلب</label>
                                     <select name="status" class="form-control">
                                         <option value="">اختر حالة الطلب</option>
-                                        @foreach(\App\Enums\OrderStatuses::cases() as $status)
-                                            <option value="{{ $status->value }}" {{ request('status') == $status->value ? 'selected' : '' }}>
-                                                {{ $status->value }}
+                                        @foreach(\App\Models\OrderStatus::all() as $status)
+                                            <option value="{{ $status->name }}" {{ request('status') == $status->name ? 'selected' : '' }}>
+                                                {{ $status->name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">السعر</label>
-                                    <input type="text" class="form-control" name="total_price" placeholder="السعر"
-                                        value="{{request('total_price')}}">
+                                    <input type="text" class="form-control" name="total_price" placeholder="السعر" value="{{request('total_price')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">المقدم</label>
-                                    <input type="text" class="form-control" name="deposited" placeholder="المقدم"
-                                        value="{{request('deposited')}}">
+                                    <input type="text" class="form-control" name="deposited" placeholder="المقدم" value="{{request('deposited')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">جاى عن طريق</label>
-                                    <input type="text" class="form-control" name="come_from" placeholder="جاى عن طريق"
-                                        value="{{request('come_from')}}">
+                                    <input type="text" class="form-control" name="come_from" placeholder="جاى عن طريق" value="{{request('come_from')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">حالة دفع الطلب</label>
@@ -492,31 +534,28 @@
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">تاريخ الاضافة</label>
-                                    <input type="date" class="form-control" name="created_at"
-                                        value="{{request('created_at')}}">
+                                    <input type="date" class="form-control" name="created_at" value="{{request('created_at')}}">
                                 </div>
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">تاريخ التعديل</label>
-                                    <input type="date" class="form-control" name="updated_at"
-                                        value="{{request('updated_at')}}">
+                                    <input type="date" class="form-control" name="updated_at" value="{{request('updated_at')}}">
                                 </div>
                                 <div class="form-group col-md-3 mb-3 d-flex align-items-end gap-2">
                                     <button class="btn btn-primary" type="submit" id="searchButton">
-                                        <i class="fas fa-search"></i> Search
+                                        <i class="fas fa-search"></i> بحث
                                     </button>
                                     <a href="{{route('orders.index')}}" class="btn btn-success">
-                                        <i class="fas fa-sync-alt"></i> Reset
+                                        <i class="fas fa-sync-alt"></i> اعادة ضبط
                                     </a>
                                 </div>
                             </div>
                         </div>
                     </form>
 
-                    <!-- Results per page dropdown -->
                     <div class="card-body search-form">
                         <div class="row">
                             <div class="col-md-2 mb-3">
-                                <label class="form-label">Results per page</label>
+                                <label class="form-label">نتائج في الصفحة</label>
                                 <select name="per_page" id="perPage" class="form-control" onchange="changePerPage()">
                                     <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
                                     <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
@@ -533,36 +572,48 @@
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
+                    <div class="card-body">
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle"></i> {{ session('success') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        @endif
+                    </div>
                     <div class="card-header pb-0">
-                        <h6>Orders Table</h6>
+                        <h6>جدول الاوردرات</h6>
                     </div>
 
-                    <!-- Bulk Actions Form -->
                     <div class="bulk-actions" id="bulkActions">
                         <form action="{{ route('orders.bulk-update-status') }}" method="POST" id="bulkUpdateForm">
                             @csrf
                             <div class="row align-items-center">
                                 <div class="col-md-4">
-                                    <span>Selected: <span class="selected-count" id="selectedCount">0</span> orders</span>
+                                    <span>محدد: <span class="selected-count" id="selectedCount">0</span> طلبيات</span>
                                 </div>
                                 <div class="col-md-4">
                                     <select name="status" class="form-control" required>
-                                        <option value="">Change status to</option>
-                                        @foreach(\App\Enums\OrderStatuses::cases() as $status)
-                                            <option value="{{ $status->value }}">{{ $status->value }}</option>
+                                        <option value="">تغيير الحاله الى</option>
+                                        @foreach(\App\Models\OrderStatus::all() as $status)
+                                            <option value="{{ $status->id }}">{{ $status->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-sync-alt me-2"></i>Update Status
+                                        <i class="fas fa-sync-alt me-2"></i>تعديل الحالة
                                     </button>
                                     <button type="button" class="btn btn-secondary" id="clearSelection">
-                                        <i class="fas fa-times me-2"></i>Clear Selection
+                                        <i class="fas fa-times me-2"></i>إلغاء التحديد
                                     </button>
                                 </div>
                             </div>
-                            <!-- THE FIX IS HERE: Added [] to the name attribute -->
                             <div id="selectedOrderIdsContainer"></div>
                         </form>
                     </div>
@@ -576,6 +627,7 @@
                                             <input type="checkbox" class="custom-checkbox" id="selectAll">
                                         </th>
                                         <th class="number-column">الرقم</th>
+                                        <th class="image-column">الصورة</th>
                                         <th class="name-column">اسم المرسل اليه</th>
                                         <th class="location-column">العنوان</th>
                                         <th class="phone-column">رقم الهاتف</th>
@@ -588,27 +640,34 @@
                                     @forelse($orders as $order)
                                         <tr>
                                             <td class="checkbox-column">
-                                                <input type="checkbox" class="custom-checkbox order-checkbox"
-                                                    value="{{ $order->id }}">
+                                                <input type="checkbox" class="custom-checkbox order-checkbox" value="{{ $order->id }}">
+                                            </td>
+                                            <td class="image-column-fixed">
+                                                @if($order->images->isNotEmpty())
+                                                    <img src="{{ asset('storage/' . $order->images->first()->photo_path) }}" 
+                                                        alt="صورة الطلب" 
+                                                        class="order-image"
+                                                        onclick="showOrderImages({{ $order->id }})">
+                                                @else
+                                                    <div class="no-image">لا توجد صور</div>
+                                                @endif
                                             </td>
                                             <td class="number-column">{{$orders->firstItem() + $loop->index}}</td>
                                             <td class="name-column">{{Str::limit($order->client_name, 20)}}</td>
                                             <td class="location-column">{{Str::limit($order->location, 20)}}</td>
                                             <td class="phone-column">{{Str::limit($order->client_phone, 20)}}</td>
                                             <td class="status-column">
-                                                <span class="status-badge status-{{ str_replace(' ', '-', $order->status) }}">
-                                                    {{$order->status}}
+                                                <span class="status-badge">
+                                                    {{ $order->status->name ?? 'N/A' }}
                                                 </span>
                                             </td>
                                             <td class="price-column">{{$order->total_price}}</td>
                                             <td class="actions-column">
                                                 <div class="action-buttons">
-                                                    <a class="btn btn-success" href="{{route('orders.edit', $order->id)}}"
-                                                        title="Edit Order">
-                                                        <i class="fas fa-edit"></i> Edit
+                                                    <a class="btn btn-success" href="{{route('orders.edit', $order->id)}}" title="Edit Order">
+                                                        <i class="fas fa-edit"></i> تعديل
                                                     </a>
-                                                    <button type="button" class="btn btn-danger delete-btn"
-                                                        data-order-id="{{ $order->id }}" title="Delete Order">
+                                                    <button type="button" class="btn btn-danger delete-btn" data-order-id="{{ $order->id }}" title="Delete Order">
                                                         <i class="fas fa-trash"></i> حذف
                                                     </button>
                                                 </div>
@@ -659,14 +718,12 @@
                     deleteForm.style.display = 'none';
                     document.body.appendChild(deleteForm);
 
-                    // Add CSRF token
                     const csrfToken = document.createElement('input');
                     csrfToken.type = 'hidden';
                     csrfToken.name = '_token';
                     csrfToken.value = "{{ csrf_token() }}";
                     deleteForm.appendChild(csrfToken);
 
-                    // Add method override for DELETE
                     const methodField = document.createElement('input');
                     methodField.type = 'hidden';
                     methodField.name = '_method';
@@ -687,7 +744,6 @@
             function showConfirmationModal(orderId) {
                 deleteFormId = orderId;
                 createDeleteForm();
-                // Set the correct route for deletion
                 deleteForm.action = `/orders/${orderId}`;
 
                 if (confirmationModal) {
@@ -719,7 +775,6 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
 
-            // Handle responsive table
             function handleResponsiveTable() {
                 const table = document.querySelector('.table-responsive');
                 if (table) {
@@ -731,10 +786,7 @@
                 }
             }
 
-            // Initial call
             handleResponsiveTable();
-
-            // Add event listener for window resize
             window.addEventListener('resize', handleResponsiveTable);
 
             // Bulk selection functionality
@@ -745,76 +797,61 @@
             const selectedOrderIds = document.getElementById('selectedOrderIds');
             const clearSelectionBtn = document.getElementById('clearSelection');
 
-            // Handle select all checkbox
             selectAllCheckbox.addEventListener('change', function () {
                 const isChecked = this.checked;
-
                 orderCheckboxes.forEach(checkbox => {
                     checkbox.checked = isChecked;
                     const orderId = parseInt(checkbox.value);
-
                     if (isChecked) {
                         selectedOrders.add(orderId);
                     } else {
                         selectedOrders.delete(orderId);
                     }
                 });
-
                 updateBulkActions();
             });
 
-            // Handle individual order checkboxes
             orderCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
                     const orderId = parseInt(this.value);
-
                     if (this.checked) {
                         selectedOrders.add(orderId);
                     } else {
                         selectedOrders.delete(orderId);
                     }
-
                     updateBulkActions();
                     updateSelectAllCheckbox();
                 });
             });
 
-            // Update select all checkbox state
             function updateSelectAllCheckbox() {
                 const totalCheckboxes = orderCheckboxes.length;
                 const checkedCheckboxes = document.querySelectorAll('.order-checkbox:checked').length;
-
                 selectAllCheckbox.checked = totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes;
                 selectAllCheckbox.indeterminate = checkedCheckboxes > 0 && checkedCheckboxes < totalCheckboxes;
             }
 
-            // Update bulk actions visibility and selected count
             function updateBulkActions() {
                 const count = selectedOrders.size;
-                const container = document.getElementById('selectedOrderIdsContainer'); // Get the new container
-
-                // Clear any existing hidden inputs from previous selections
+                const container = document.getElementById('selectedOrderIdsContainer');
                 container.innerHTML = '';
 
                 if (count > 0) {
                     bulkActions.classList.add('show');
                     selectedCount.textContent = count;
 
-                    // Create a hidden input for EACH selected order ID
                     selectedOrders.forEach(orderId => {
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
-                        hiddenInput.name = 'order_ids[]'; // The [] is crucial!
+                        hiddenInput.name = 'order_ids[]';
                         hiddenInput.value = orderId;
                         container.appendChild(hiddenInput);
                     });
-
                 } else {
                     bulkActions.classList.remove('show');
                 }
             }
 
-            // Clear selection
             clearSelectionBtn.addEventListener('click', function () {
                 selectedOrders.clear();
                 orderCheckboxes.forEach(checkbox => {
@@ -824,7 +861,6 @@
                 updateBulkActions();
             });
 
-            // Handle bulk update form submission
             const bulkUpdateForm = document.getElementById('bulkUpdateForm');
             bulkUpdateForm.addEventListener('submit', function (e) {
                 if (selectedOrders.size === 0) {
@@ -842,7 +878,6 @@
             });
         });
 
-        // Function to change results per page
         function changePerPage() {
             const perPage = document.getElementById('perPage').value;
             const url = new URL(window.location.href);

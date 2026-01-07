@@ -27,10 +27,9 @@ class OrderCreateRequest extends FormRequest
         return [
             "location"     => "required|string|max:255|min:3",
             "client_name"  => "required|string|max:255|min:3",
-            "status"       => ['required', Rule::in(OrderStatuses::values())],
+            "status_id"    => "required|exists:order_statuses,id",
             "client_phone" => "nullable|string|max:255|min:3",
             "city"         => "required|string|max:255|min:3",
-            // "post_office"  => "required|string|max:255|min:3",
             "deposited"    => "nullable|integer|min:0",
             "come_from"    => "nullable|string|max:255|min:3",
             "payment_status" => ['nullable', Rule::in(PaymentStatus::values())],
@@ -46,6 +45,8 @@ class OrderCreateRequest extends FormRequest
             "is_done.*"    => "boolean",
             "notes"        => "nullable|string|max:255|min:3",
             "total_price_after_discount" => "nullable|numeric|min:0",
+            "photos"       => "required|array|max:5", // أضفنا هذا السطر
+            "photos.*"     => "image|mimes:jpeg,png,jpg,gif|max:2048", // وأضفنا هذا السطر
         ];
     }
 }

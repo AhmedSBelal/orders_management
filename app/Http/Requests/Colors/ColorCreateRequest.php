@@ -21,8 +21,32 @@ class ColorCreateRequest extends FormRequest
      */
     public function rules(): array
     {
+         $colorId = $this->route('color') ? $this->route('color')->id : null;
+
         return [
-            'name' => 'required|string|unique:colors,name',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                // قاعدة التحقق الفريدة الصحيحة
+                'unique:colors,name,' . $colorId
+            ],
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'name.unique' => 'اسم اللون هذا موجود بالفعل.',
+            'photo.image' => 'يجب أن يكون الملف المرفوع صورة.',
+            'photo.mimes' => 'صيغ الصور المسموح بها هي: jpeg, png, jpg, gif, svg.',
+            'photo.max' => 'حجم الصورة يجب ألا يتجاوز 2 ميجابايت.',
         ];
     }
 }

@@ -28,6 +28,25 @@ class ProductCreateRequest extends FormRequest
             'cost' => 'required|numeric',
             'type' => 'required|string|max:255',
             'tailor_name' => 'nullable|string|max:255',
+             // إضافة قواعد التحقق للصور
+            'photos' => 'nullable',
+            'photos.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // كل صورة يجب أن تكون صورة حقيقية، من الأنواع المحددة، وحجمها الأقصى 2 ميجابايت (2048 كيلوبايت)
+        ];
+    }
+
+     /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'photos.*.image' => 'يجب أن يكون كل ملف مرفوع صورة.',
+            'photos.*.mimes' => 'صيغ الصور المسموح بها هي: jpeg, png, jpg, gif فقط.',
+            'photos.*.max' => 'حجم كل صورة يجب ألا يتجاوز 2 ميجابايت.',
+            'price.min' => 'يجب أن يكون سعر المنتج رقماً موجباً.',
+            'cost.min' => 'يجب أن تكون تكلفة المنتج رقماً موجباً.',
         ];
     }
 }

@@ -1,3 +1,4 @@
+{{-- views/layout/app-dashboard.blade.php --}}
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 

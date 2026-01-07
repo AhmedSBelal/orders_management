@@ -24,7 +24,7 @@ class BulkUpdateStatusRequest extends FormRequest
         return [
             'order_ids' => 'required|array',
             'order_ids.*' => 'exists:orders,id',
-            'status' => 'required|string|in:' . implode(',', \App\Enums\OrderStatuses::values()),
+            'status' => 'required|exists:order_statuses,id'
         ];
     }
 }

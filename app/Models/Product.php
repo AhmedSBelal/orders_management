@@ -33,6 +33,14 @@ class Product extends Model
         return $this->belongsToMany( Order::class, 'order_product', 'product_id');
     }
 
+    /**
+     * Get the images for the product.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
     static function productsByFilter($request) {
 
         $products = self::query();
@@ -69,7 +77,7 @@ class Product extends Model
             $products->whereDate('created_at', $request->updated_at);
         }
 
-        return $products->get();
+        return $products;
 
     }
 

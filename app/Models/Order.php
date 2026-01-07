@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use App\Http\Requests\Orders\OrdersFilterRequest;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Requests\Orders\OrdersFilterRequest;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Order extends Model
@@ -22,7 +23,7 @@ class Order extends Model
         'post_office',
         'deposited',
         'total_price',
-        'status',
+        'status_id',
         'come_from',
         'payment_status',
         'notes',
@@ -40,6 +41,20 @@ class Order extends Model
         return $this->belongsToMany(Product::class, 'order_product', 'order_id')
             ->withPivot('color_id', 'quantity', 'size', 'is_done'); // Include pivot columns;
     }
+
+    public function status(): BelongsTo // <-- إضافة العلاقة الجديدة
+    {
+        return $this->belongsTo(OrderStatus::class);
+    }
+
+    /**
+     * Get the images for the order.
+     */
+    public function images(): HasMany // <-- العلاقة الجديدة
+    {
+        return $this->hasMany(OrderImage::class);
+    }
+
 
     // filter
 
@@ -61,7 +76,11 @@ class Order extends Model
         }
 
         if (!empty($request->status)) {
-            $orders->where('status', $request->status);
+            // البحث عن الحالة بالاسم أولاً
+            $status = \App\Models\OrderStatus::where('name', $request->status)->first();
+            if ($status) {
+                $orders->where('status_id', $status->id);
+            }
         }
 
         if (!empty($request->total_price)) {
@@ -84,13 +103,10 @@ class Order extends Model
             $orders->whereDate('created_at', $request->created_at);
         }
 
-        // FIX 1: Corrected the column name from 'created_at' to 'updated_at'
         if (!empty($request->updated_at)) {
             $orders->whereDate('updated_at', $request->updated_at);
         }
 
-        // FIX 2: Return the query builder instance itself, NOT the paginated results.
-        // Remove ->paginate(10) from here.
         return $orders;
     }
 

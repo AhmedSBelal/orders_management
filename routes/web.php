@@ -1,7 +1,10 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderStatusController;
 
 Route::controller(\App\Http\Controllers\AuthController::class)->group(function () {
 
@@ -23,12 +26,19 @@ Route::middleware(['auth'])->group(function () {
     // Auth
     Route::post('logout', [\App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
 
-    // orders
-    Route::resource('orders', \App\Http\Controllers\OrderController::class);
-    Route::post('orders/bulk-update-status', [\App\Http\Controllers\OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
-    Route::get('in-processing', [HomeController::class, 'inProcessing'])->name('in-processing');
+    // welcome
+    Route::get('/welcome', [HomeController::class, 'welcome'])->name('welcome');
 
-    Route::resource('products', \App\Http\Controllers\ProductController::class);
+    // orders
+    Route::resource('orders/statuses', OrderStatusController::class, ['names' => 'orders.statuses']);
+    Route::resource('orders', OrderController::class);
+    Route::post('orders/bulk-update-status', [OrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
+    Route::get('in-processing', [HomeController::class, 'inProcessing'])->name('in-processing');
+    Route::post('orders/search', [OrderController::class, 'search'])->name('orders.search');
+    
+
+    Route::resource('products', ProductController::class);
+    Route::delete('/products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');
 
     Route::resource('colors', \App\Http\Controllers\ColorController::class);
 

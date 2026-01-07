@@ -15,7 +15,8 @@ class Color extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
-        'name'
+        'name',
+        'photo',
     ];
 
     // relations
@@ -32,7 +33,7 @@ class Color extends Model
             $colors->where('name', 'like', '%' . $request->name . '%');
         }
 
-        return $colors->get();
+        return $colors;
 
     }
 
