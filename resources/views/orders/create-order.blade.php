@@ -453,7 +453,7 @@
                                                 اختر الصور
                                             </label>
                                             <input type="file" name="photos[]" id="photoUpload" class="d-none" 
-                                                   multiple accept="image/*" required>
+                                                   multiple accept="image/*">
                                             <small class="text-muted ms-3">يمكنك اختيار عدة صور في نفس الوقت</small>
                                             <br>
                                             <small class="text-muted ms-3"> (صيغ مقبولة: jpeg, png, jpg, gif. الحد الأقصى: 2 ميجابايت)</small>

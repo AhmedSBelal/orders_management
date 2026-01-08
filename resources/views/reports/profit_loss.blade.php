@@ -524,9 +524,9 @@
                     <button onclick="window.print()" class="btn btn-primary me-2">
                         <i class="fas fa-print me-2"></i>طباعة التقرير
                     </button>
-                    <a href="{{ route('reports.export', ['format' => 'pdf']) }}" class="btn btn-danger me-2">
+                    {{-- <a href="{{ route('reports.export', ['format' => 'pdf']) }}" class="btn btn-danger me-2">
                         <i class="fas fa-file-pdf me-2"></i>تصدير PDF
-                    </a>
+                    </a> --}}
                     <a href="{{ route('reports.export', ['format' => 'excel']) }}" class="btn btn-success">
                         <i class="fas fa-file-excel me-2"></i>تصدير Excel
                     </a>
