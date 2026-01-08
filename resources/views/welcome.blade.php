@@ -3,6 +3,12 @@
 
 @section('title', $title)
 
+@section('content')
+
+<a href="{{ route('reports.profit-loss') }}">تقرير الربح والخسارة</a>
+
+@endsection
+
 {{-- @push('css')
     <style>
         .hidden {

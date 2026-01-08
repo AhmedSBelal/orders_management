@@ -3,8 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderStatusController;
+use App\Http\Controllers\ExpenseCategoryController;
 
 Route::controller(\App\Http\Controllers\AuthController::class)->group(function () {
 
@@ -41,5 +44,15 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');
 
     Route::resource('colors', \App\Http\Controllers\ColorController::class);
+
+
+    Route::resource('expenses', ExpenseController::class);
+    Route::resource('expense-categories', ExpenseCategoryController::class);
+
+    Route::get('reports/profit-loss', [ReportController::class, 'profitLoss'])
+    ->name('reports.profit-loss');
+
+    Route::get('/reports/export/{format}', [ReportController::class, 'exportReport'])->name('reports.export');
+
 
 });

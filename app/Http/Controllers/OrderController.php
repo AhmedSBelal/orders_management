@@ -483,6 +483,48 @@ class OrderController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Order $order)
+    {
+        try {
+            $title = 'View - Order';
+            
+            // Load relationships
+            $order->load(['images', 'status', 'user', 'products']);
+            
+            // Get colors for the products
+            $colorIds = $order->products->pluck('pivot.color_id')->filter()->unique();
+            $colors = Color::whereIn('id', $colorIds)->get()->keyBy('id');
+            
+            // Format products with color names
+            $products = $order->products->map(function ($product) use ($colors) {
+                $colorName = 'N/A';
+                if ($product->pivot->color_id && isset($colors[$product->pivot->color_id])) {
+                    $colorName = $colors[$product->pivot->color_id]->name;
+                }
+                
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'color_id' => $product->pivot->color_id,
+                    'color_name' => $colorName,
+                    'size' => $product->pivot->size,
+                    'quantity' => $product->pivot->quantity,
+                    'is_done' => $product->pivot->is_done,
+                    'subtotal' => $product->price * $product->pivot->quantity
+                ];
+            });
+            
+            return view('orders.show', compact('title', 'order', 'products'));
+        } catch (\Exception $exception) {
+            Log::error('Error in OrderController@show: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while loading the order. Please try again later.');
+        }
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Order $order)

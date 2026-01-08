@@ -642,6 +642,7 @@
                                             <td class="checkbox-column">
                                                 <input type="checkbox" class="custom-checkbox order-checkbox" value="{{ $order->id }}">
                                             </td>
+                                            <td class="number-column">{{ $order->id }}</td>
                                             <td class="image-column-fixed">
                                                 @if($order->images->isNotEmpty())
                                                     <img src="{{ asset('storage/' . $order->images->first()->photo_path) }}" 
@@ -651,8 +652,7 @@
                                                 @else
                                                     <div class="no-image">لا توجد صور</div>
                                                 @endif
-                                            </td>
-                                            <td class="number-column">{{$orders->firstItem() + $loop->index}}</td>
+                                            </td> 
                                             <td class="name-column">{{Str::limit($order->client_name, 20)}}</td>
                                             <td class="location-column">{{Str::limit($order->location, 20)}}</td>
                                             <td class="phone-column">{{Str::limit($order->client_phone, 20)}}</td>
@@ -665,11 +665,14 @@
                                             <td class="actions-column">
                                                 <div class="action-buttons">
                                                     <a class="btn btn-success" href="{{route('orders.edit', $order->id)}}" title="Edit Order">
-                                                        <i class="fas fa-edit"></i> تعديل
+                                                         تعديل
                                                     </a>
                                                     <button type="button" class="btn btn-danger delete-btn" data-order-id="{{ $order->id }}" title="Delete Order">
-                                                        <i class="fas fa-trash"></i> حذف
+                                                        حذف
                                                     </button>
+                                                    <a href="{{ route('orders.show', $order->id) }}" class="btn btn-info btn-sm" title="عرض">
+                                                        مشاهده
+                                                    </a>
                                                 </div>
                                             </td>
                                         </tr>
