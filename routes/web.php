@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvoiceController;
@@ -56,5 +57,27 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports/export/{format}', [ReportController::class, 'exportReport'])->name('reports.export');
 
     Route::get('/invoice/{order}', [InvoiceController::class, 'print'])->name('invoice.print');
+
+
+    // صفحة النسخ الاحتياطي الرئيسية
+    Route::get('/backup', [BackupController::class, 'index'])->name('backup.index');
+    
+    // تصدير كامل قاعدة البيانات
+    Route::post('/backup/export', [BackupController::class, 'export'])->name('backup.export');
+    
+    // تصدير جداول محددة
+    Route::post('/backup/export-tables', [BackupController::class, 'exportTables'])->name('backup.export.tables');
+    
+    // استيراد النسخة الاحتياطية
+    Route::post('/backup/import', [BackupController::class, 'import'])->name('backup.import');
+    
+    // عرض قائمة النسخ الاحتياطية
+    Route::get('/backup/list', [BackupController::class, 'listBackups'])->name('backup.list');
+    
+    // تحميل نسخة احتياطية
+    Route::get('/backup/download/{filename}', [BackupController::class, 'download'])->name('backup.download');
+    
+    // حذف نسخة احتياطية
+    Route::delete('/backup/delete/{filename}', [BackupController::class, 'delete'])->name('backup.delete');
 
 });

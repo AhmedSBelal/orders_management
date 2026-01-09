@@ -3,7 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>فاتورة شراء</title>
+     <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('media/agyad_maka.jpeg') }}">
+    <link rel="icon" type="image/jpeg" sizes="32x32" href="{{ asset('media/agyad_maka.jpeg') }}">
+    <link rel="icon" type="image/jpeg" sizes="16x16" href="{{ asset('media/agyad_maka.jpeg') }}">
+    <meta name="theme-color" content="#ffffff">
     <style>
+
+        @page {
+            /* Set the favicon for print/PDF */
+            prince-bookmark-level: none;
+            marks: crop cross;
+            size: A4 portrait;
+            
+            /* TCPDF supports background-image in @page */
+            background-image: url("{{ asset('media/agyad_maka.jpeg') }}");
+            background-position: 10px 10px; /* top left corner */
+            background-size: 16px 16px;
+            background-repeat: no-repeat;
+        }
+
+
         /* TCPDF works best with basic CSS. Keep it simple. */
         body {
             font-family: 'DejaVu Sans', 'Arial', sans-serif; /* DejaVu Sans is a good choice for Arabic in TCPDF */

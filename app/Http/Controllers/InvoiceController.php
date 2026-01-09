@@ -31,8 +31,8 @@ class InvoiceController extends Controller
         
         // إعدادات RTL
         $pdf->setRTL(true);
-        $pdf->SetCreator('Your App');
-        $pdf->SetAuthor('Your Company');
+        $pdf->SetCreator('Ajyad Maka');
+        $pdf->SetAuthor('Ahmed Saad');
         $pdf->SetTitle('Invoice ' . $order->id);
         
         // إعدادات الخط - using a slightly smaller font to save space
