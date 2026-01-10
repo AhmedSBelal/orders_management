@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Products\ProductCreateRequest;
+use App\Http\Requests\Products\ProductUpdateRequest;
 use App\Http\Requests\Products\ProductsFilterRequest;
 
 class ProductController extends Controller
@@ -19,7 +20,6 @@ class ProductController extends Controller
     public function index(ProductsFilterRequest $request)
     {
         $title = "Products";
-        // Get the number of items per page from the request, defaulting to 10
         $perPage = $request->get('per_page', 10);
         $productsQuery = Product::productsByFilter($request);
         $products = $productsQuery->paginate($perPage)->appends($request->query());
@@ -42,29 +42,25 @@ class ProductController extends Controller
     public function store(ProductCreateRequest $request)
     {
         try {
-            // نستخدم معاملة قاعدة البيانات لضمان أن كل شيء يتم أو لا شيء
             DB::beginTransaction();
 
             $data = $request->validated();
             $data['user_id'] = Auth::user()->id;
 
-            // إنشاء المنتج أولاً
             $product = Product::create($data);
 
-            // التحقق من وجود صور ورفعها
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
                     $photoPath = $photo->store('products', 'public');
-                    // إنشاء سجل جديد لكل صورة في جدول product_images
                     $product->images()->create(['photo_path' => $photoPath]);
                 }
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'تم إضافة المنتج وصوره بنجاح.');
+            return redirect()->back()->with('success', 'تم إضافة المنتج بنجاح.');
         } catch (\Exception $exception) {
-            DB::rollBack(); // التراجع عن كل التغييرات في حالة حدوث خطأ
-            return redirect()->back()->with('error', $exception->getMessage())->withInput();
+            DB::rollBack();
+            return redirect()->back()->with('error', 'حدث خطأ: ' . $exception->getMessage())->withInput();
         }
     }
 
@@ -73,7 +69,44 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        //
+        $product->load('images');
+        $title = 'Product Details';
+        return view('products.show', compact('product', 'title'));
+    }
+
+    /**
+     * Get product details for AJAX request
+     */
+    public function getDetails(Product $product)
+    {
+        try {
+            $product->load('images', 'user');
+            
+            $profitMarginRetail = $product->price - $product->cost;
+            $profitMarginWholesale = $product->wholesale_price ? ($product->wholesale_price - $product->cost) : 0;
+            $discountPercentage = 0;
+            
+            if ($product->wholesale_price && $product->price > 0) {
+                $discountPercentage = (($product->price - $product->wholesale_price) / $product->price) * 100;
+            }
+            
+            $html = view('products.partials.details-modal-content', compact(
+                'product', 
+                'profitMarginRetail', 
+                'profitMarginWholesale',
+                'discountPercentage'
+            ))->render();
+            
+            return response()->json([
+                'success' => true,
+                'html' => $html
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تحميل البيانات: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -81,24 +114,21 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        // تحميل الصور مع المنتج
         $product->load('images');
         $title = 'Edit Product';
         return view('products.edit', compact('product', 'title'));
     }
 
-
     /**
      * Update the specified resource in storage.
      */
-     public function update(ProductCreateRequest $request, Product $product)
+    public function update(ProductUpdateRequest $request, Product $product)
     {
         try {
             DB::beginTransaction();
 
             $product->update($request->validated());
 
-            // إضافة الصور الجديدة
             if ($request->hasFile('photos')) {
                 foreach ($request->file('photos') as $photo) {
                     $photoPath = $photo->store('products', 'public');
@@ -120,9 +150,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         try {
-            // حذف المنتج سيقوم تلقائياً بحذف الصور المرتبطة به
-            // بفضل onDelete('cascade') في الـ migration
-            // ولكن يجب حذف الملفات الفعلية من التخزين
             foreach ($product->images as $image) {
                 Storage::disk('public')->delete($image->photo_path);
             }
@@ -139,20 +166,26 @@ class ProductController extends Controller
      */
     public function deleteImage(Product $product, ProductImage $image)
     {
-        // التأكد من أن الصورة تخص هذا المنتج
-        if ($image->product_id !== $product->id) {
-            abort(403, 'Unauthorized action.');
-        }
-
         try {
-            // حذف الملف من التخزين
+            if ($image->product_id !== $product->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'هذه الصورة لا تنتمي لهذا المنتج'
+                ], 403);
+            }
+            
             Storage::disk('public')->delete($image->photo_path);
-            // حذف السجل من قاعدة البيانات
             $image->delete();
-
-            return response()->json(['success' => true, 'message' => 'تم حذف الصورة بنجاح.']);
-        } catch (\Exception $exception) {
-            return response()->json(['success' => false, 'message' => 'فشل حذف الصورة.'], 500);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'تم حذف الصورة بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء حذف الصورة: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

@@ -82,59 +82,6 @@
             transform: translateY(-2px);
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 0.35em 0.65em;
-            font-size: 0.75em;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: 0.25rem;
-            text-transform: capitalize;
-        }
-
-        .status-تحت-التجهيز {
-            background-color: #0dcaf0;
-            color: #000;
-        }
-
-        .status-فى-المصنع {
-            background-color: #6f42c1;
-            color: #fff;
-        }
-
-        .status-فى-المصنع-2 {
-            background-color: #6f42c1;
-            color: #fff;
-        }
-
-        .status-فى-المصنع-3 {
-            background-color: #6f42c1;
-            color: #fff;
-        }
-
-        .status-تم-التجهيز {
-            background-color: #198754;
-            color: #fff;
-        }
-
-        .status-تم-الشحن {
-            background-color: #20c997;
-            color: #000;
-        }
-
-        .status-مرتجع {
-            background-color: #fd7e14;
-            color: #000;
-        }
-
-        .status-الغاء {
-            background-color: #dc3545;
-            color: #fff;
-        }
-
         .loading {
             position: relative;
             pointer-events: none;
@@ -220,27 +167,6 @@
             border-color: #dee2e6;
         }
 
-        .pagination .page-link:focus {
-            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-            z-index: 3;
-        }
-
-        .pagination .page-item:first-child .page-link,
-        .pagination .page-item:last-child .page-link {
-            border-radius: 0.25rem;
-        }
-
-        @media (max-width: 576px) {
-            .pagination {
-                flex-wrap: wrap;
-            }
-
-            .pagination .page-link {
-                padding: 0.375rem 0.75rem;
-                min-width: 2rem;
-            }
-        }
-
         .empty-state {
             text-align: center;
             padding: 2rem;
@@ -269,93 +195,9 @@
             padding: 1.5rem;
         }
 
-        .modal-footer {
-            border-top: 1px solid #dee2e6;
-            padding: 1rem;
-        }
-
         .modal-title {
             font-weight: 600;
             color: #212529;
-        }
-
-        .btn-close {
-            padding: 0.5rem;
-            margin: -0.5rem;
-        }
-
-        /* Column specific widths */
-        .table .number-column {
-            width: 80px;
-            min-width: 80px;
-        }
-
-        .table .checkbox-column {
-            width: 50px;
-            min-width: 50px;
-        }
-
-        .table .location-column {
-            width: 150px;
-            min-width: 150px;
-        }
-
-        .table .name-column {
-            width: 150px;
-            min-width: 150px;
-        }
-
-        .table .phone-column {
-            width: 120px;
-            min-width: 120px;
-        }
-
-        .table .status-column {
-            width: 120px;
-            min-width: 120px;
-        }
-
-        .table .price-column {
-            width: 100px;
-            min-width: 100px;
-        }
-
-        .table .deposit-column {
-            width: 100px;
-            min-width: 100px;
-        }
-
-        .table .actions-column {
-            width: 200px;
-            min-width: 200px;
-        }
-
-        /* Bulk actions styles */
-        .bulk-actions {
-            background-color: #f8f9fa;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .bulk-actions.show {
-            display: block;
-        }
-
-        .custom-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .selected-count {
-            background-color: #0d6efd;
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.875rem;
-            margin-left: 0.5rem;
         }
     </style>
 @endpush
@@ -387,6 +229,7 @@
 
         <br>
 
+        <!-- Search Form -->
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
@@ -405,8 +248,12 @@
                                 <input type="text" class="form-control" name="description" placeholder="وصف المنتج" value="{{request('description')}}">
                             </div>
                             <div class="col-md-2 mb-3">
-                                <label class="form-label">سعر المنتج</label>
-                                <input type="text" class="form-control" name="price" placeholder="سعر المنتج" value="{{request('price')}}">
+                                <label class="form-label">سعر القطاعي</label>
+                                <input type="text" class="form-control" name="price" placeholder="سعر القطاعي" value="{{request('price')}}">
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">سعر الجمله</label>
+                                <input type="text" class="form-control" name="wholesale_price" placeholder="سعر الجمله" value="{{request('wholesale_price')}}">
                             </div>
                             <div class="col-md-2 mb-3">
                                 <label class="form-label">تكلفه المنتج</label>
@@ -429,8 +276,12 @@
                                 <input type="date" class="form-control" name="updated_at" value="{{request('updated_at')}}">
                             </div>
                             <div class="form-group col-md-3 mb-3 d-flex align-items-end gap-2">
-                                <button class="btn btn-primary" type="submit">Search</button>
-                                <a href="{{route('products.index')}}" class="btn btn-success">Reset</a>
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-search"></i> بحث
+                                </button>
+                                <a href="{{route('products.index')}}" class="btn btn-success">
+                                    <i class="fas fa-sync-alt"></i> إعادة ضبط
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -438,73 +289,163 @@
             </div>
         </div>
 
+        <!-- Products Table -->
         <div class="row">
             <div class="col-12">
                 <div class="card mb-4">
-                    <div class="card-body">
-                        @if(session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <i class="fas fa-check-circle"></i> {{ session('success') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-                        @if(session('error'))
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-triangle"></i> {{ session('error') }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="card-header pb-0">
+                    <div class="card-header pb-0 d-flex justify-content-between align-items-center">
                         <h6>جدول المنتجات</h6>
+                        <div>
+                            <span class="badge bg-info me-2">
+                                <i class="fas fa-box"></i> {{ $products->total() }} منتج
+                            </span>
+                        </div>
                     </div>
                     <div class="card-body px-0 pt-0 pb-2">
                         <div class="table-responsive p-0">
                             <table class="table align-items-center mb-0">
                                 <thead>
                                 <tr>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الرقم</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">صورة المنتج</th> {{-- العمود الجديد --}}
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">#</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الصورة</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">اسم المنتج</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">سعر المنتج</th>
-                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">عمليات</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">السعر القطاعي</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">سعر الجمله</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">نسبة الخصم</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">التكلفة</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الربحية</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">الإجراءات</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($products as $product)
+                                @forelse($products as $product)
                                     <tr>
                                         <td class="align-middle text-center">
-                                            <div class="d-flex px-2 py-1">{{Str::limit($loop->iteration, 20)}}</div>
+                                            <span class="text-secondary text-xs font-weight-bold">{{ $loop->iteration + (($products->currentPage() - 1) * $products->perPage()) }}</span>
                                         </td>
                                         <td class="align-middle text-center">
                                             @if($product->images->isNotEmpty())
-                                                <img src="{{ asset('storage/' . $product->images->first()->photo_path) }}" alt="{{ $product->name }}" width="50" height="50" class="rounded" style="object-fit: cover;">
+                                                <img src="{{ asset('storage/' . $product->images->first()->photo_path) }}" 
+                                                    alt="{{ $product->name }}" 
+                                                    width="50" 
+                                                    height="50" 
+                                                    class="rounded-circle border"
+                                                    style="object-fit: cover; cursor: pointer;" 
+                                                    onclick="showImageModal('{{ asset('storage/' . $product->images->first()->photo_path) }}', '{{ $product->name }}')">
                                             @else
-                                                <span class="text-muted">لا توجد صور</span>
+                                                <div class="icon icon-shape bg-secondary rounded-circle text-center">
+                                                    <i class="fas fa-image text-white"></i>
+                                                </div>
                                             @endif
                                         </td>
                                         <td class="align-middle text-center">
-                                            {{Str::limit($product->name, 20)}}
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="mb-0 text-sm">{{ $product->name }}</h6>
+                                                @if($product->type)
+                                                    <span class="badge bg-light text-dark mt-1">{{ $product->type }}</span>
+                                                @endif
+                                                @if($product->tailor_name)
+                                                    <small class="text-muted">الخياط: {{ $product->tailor_name }}</small>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td class="align-middle text-center">
-                                            {{Str::limit($product->price, 20)}}
+                                            <span class="text-secondary text-xs font-weight-bold">
+                                                {{ number_format($product->price, 2) }} ج
+                                            </span>
                                         </td>
-                                        <td class="align-middle text-center d-flex p-2 justify-content-center">
-                                            <a class="btn btn-success ms-2" href="{{route('products.edit', $product->id)}}">Edit</a>
-                                            <form action="{{route('products.destroy', $product->id)}}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                            </form>
+                                        <td class="align-middle text-center">
+                                            @if($product->wholesale_price)
+                                                <span class="text-success text-xs font-weight-bold">
+                                                    {{ number_format($product->wholesale_price, 2) }} ج
+                                                </span>
+                                                @if($product->wholesale_price < $product->price)
+                                                    <span class="badge bg-success badge-sm">
+                                                        <i class="fas fa-users"></i>
+                                                    </span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted text-xs">
+                                                    {{ number_format($product->price, 2) }} ج
+                                                    <small class="d-block">(نفس القطاعي)</small>
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            @if($product->wholesale_price && $product->price > 0)
+                                                @php
+                                                    $discountPercentage = (($product->price - $product->wholesale_price) / $product->price) * 100;
+                                                @endphp
+                                                @if($discountPercentage > 0)
+                                                    <span class="badge bg-success text-white">
+                                                        {{ number_format($discountPercentage, 1) }}%
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted">0%</span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <span class="text-secondary text-xs font-weight-bold">
+                                                {{ number_format($product->cost, 2) }} ج
+                                            </span>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            @php
+                                                $profitMarginRetail = $product->price - $product->cost;
+                                                $profitMarginWholesale = $product->wholesale_price ? ($product->wholesale_price - $product->cost) : 0;
+                                            @endphp
+                                            <div class="d-flex flex-column align-items-center">
+                                                <span class="text-success text-xs">
+                                                    قطاعي: {{ number_format($profitMarginRetail, 2) }} ج
+                                                </span>
+                                                @if($product->wholesale_price)
+                                                    <span class="text-info text-xs">
+                                                        جمله: {{ number_format($profitMarginWholesale, 2) }} ج
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a class="btn btn-success btn-sm" href="{{route('products.edit', $product->id)}}" title="تعديل">
+                                                    تعديل
+                                                </a>
+                                                <form action="{{route('products.destroy', $product->id)}}" method="POST" 
+                                                    onsubmit="return confirm('هل أنت متأكد من حذف هذا المنتج؟');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="حذف">
+                                                        حذف
+                                                    </button>
+                                                </form>
+                                                <button class="btn btn-info btn-sm" 
+                                                        onclick="showProductDetails({{ $product->id }})"
+                                                        title="تفاصيل">
+                                                    مشاهده
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="text-center py-4">
+                                            <div class="empty-state">
+                                                <i class="fas fa-box-open fa-3x"></i>
+                                                <h5 class="mt-3">لا توجد منتجات</h5>
+                                                <p class="text-muted">لم يتم العثور على منتجات تطابق معايير البحث</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
                                 </tbody>
                             </table>
                         </div>
                         @if($products->hasPages())
                             <div class="p-3">
-                                {{ $products->links('pagination::bootstrap-4') }}
+                                {{ $products->appends(request()->query())->links('pagination::bootstrap-4') }}
                             </div>
                         @endif
                     </div>
@@ -512,4 +453,81 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for Image Preview -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalTitle">صورة المنتج</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" alt="" class="img-fluid rounded">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Product Details -->
+    <div class="modal fade" id="productDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">تفاصيل المنتج</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="productDetailsContent">
+                    <!-- Content will be loaded via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('js')
+<script>
+    function showImageModal(imageSrc, productName) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageModalTitle').textContent = 'صورة المنتج: ' + productName;
+        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        imageModal.show();
+    }
+    
+    function showProductDetails(productId) {
+        document.getElementById('productDetailsContent').innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">جاري التحميل...</span>
+                </div>
+                <p class="mt-2">جاري تحميل تفاصيل المنتج...</p>
+            </div>
+        `;
+        
+        fetch(`/products/${productId}/details`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('productDetailsContent').innerHTML = data.html;
+                } else {
+                    document.getElementById('productDetailsContent').innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i> ${data.message}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('productDetailsContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> حدث خطأ أثناء تحميل البيانات
+                    </div>
+                `;
+                console.error('Error:', error);
+            });
+        
+        const detailsModal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
+        detailsModal.show();
+    }
+</script>
+@endpush

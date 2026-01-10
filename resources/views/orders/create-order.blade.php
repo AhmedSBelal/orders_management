@@ -307,6 +307,61 @@
             margin-bottom: 1rem;
         }
     </style>
+
+    <style>
+        /* في قسم الـ CSS الموجود */
+        .order-type-selector {
+            flex: 1;
+            position: relative;
+        }
+
+        .order-type-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px;
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 80px;
+        }
+
+        .order-type-label i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: #6c757d;
+        }
+
+        .order-type-label span {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .order-type-radio:checked + .order-type-label {
+            background-color: #e7f1ff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+        }
+
+        .order-type-radio:checked + .order-type-label i,
+        .order-type-radio:checked + .order-type-label span {
+            color: #0d6efd;
+        }
+
+        .order-type-radio:focus + .order-type-label {
+            border-color: #0d6efd;
+        }
+
+        /* تصميم الهواڤر */
+        .order-type-label:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -323,6 +378,33 @@
                         @csrf
                         <div class="card-body">
                             <div class="row">
+
+                                <div class="mb-3 col-md-6 col-12">
+                                    <label class="form-label">نوع الطلب <span class="text-danger">*</span></label>
+                                    <div class="d-flex gap-3">
+                                        <div class="order-type-selector">
+                                            <input type="radio" name="is_wholesale" id="retail_type" value="0" 
+                                                class="order-type-radio" hidden checked>
+                                            <label for="retail_type" class="order-type-label">
+                                                <i class="fas fa-user"></i>
+                                                <span>قطاعي</span>
+                                            </label>
+                                        </div>
+                                        <div class="order-type-selector">
+                                            <input type="radio" name="is_wholesale" id="wholesale_type" value="1" 
+                                                class="order-type-radio" hidden {{ old('is_wholesale') == '1' ? 'checked' : '' }}>
+                                            <label for="wholesale_type" class="order-type-label">
+                                                <i class="fas fa-users"></i>
+                                                <span>جمله</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    @error('is_wholesale')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div></div>
 
                                 <div class="mb-3 col-md-6 col-12">
                                     <label class="form-label">اسم المرسل اليه <span class="text-danger">*</span></label>

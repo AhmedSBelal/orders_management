@@ -47,6 +47,7 @@ class OrderCreateRequest extends FormRequest
             "total_price_after_discount" => "nullable|numeric|min:0",
             "photos"       => "nullable|array|max:5", // أضفنا هذا السطر
             "photos.*"     => "nullable|image|mimes:jpeg,png,jpg,gif|max:2048", // وأضفنا هذا السطر
+            'is_wholesale' => 'sometimes|boolean',
         ];
     }
 }

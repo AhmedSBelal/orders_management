@@ -384,6 +384,27 @@
             color: #888;
         }
     </style>
+    <style>
+        /* أضف في الـ CSS الخاص بالصفحة */
+        select[name="is_wholesale"] {
+            background-position: left 0.75rem center;
+            padding-left: 2.5rem;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-size: 16px 12px;
+        }
+
+        /* تصميم خاص لخيارات نوع الطلب */
+        select[name="is_wholesale"] option[value="0"] {
+            background-color: #e7f1ff;
+            color: #0d6efd;
+        }
+
+        select[name="is_wholesale"] option[value="1"] {
+            background-color: #e8f5e8;
+            color: #28a745;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -511,6 +532,16 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                
+                                <div class="col-md-2 mb-3">
+                                    <label class="form-label">نوع الطلب</label>
+                                    <select name="is_wholesale" class="form-control">
+                                        <option value="">كل الأنواع</option>
+                                        <option value="0" {{ request('is_wholesale') === '0' ? 'selected' : '' }}>قطاعي</option>
+                                        <option value="1" {{ request('is_wholesale') === '1' ? 'selected' : '' }}>جمله</option>
+                                    </select>
+                                </div>
+                                
                                 <div class="col-md-2 mb-3">
                                     <label class="form-label">السعر</label>
                                     <input type="text" class="form-control" name="total_price" placeholder="السعر" value="{{request('total_price')}}">
@@ -632,6 +663,7 @@
                                         <th class="location-column">العنوان</th>
                                         <th class="phone-column">رقم الهاتف</th>
                                         <th class="status-column">حالة الطلب</th>
+                                        <th>نوع الطلب</th>
                                         <th class="price-column">السعر</th>
                                         <th class="actions-column">عمليات على الطلب</th>
                                     </tr>
@@ -642,7 +674,7 @@
                                             <td class="checkbox-column">
                                                 <input type="checkbox" class="custom-checkbox order-checkbox" value="{{ $order->id }}">
                                             </td>
-                                            <td class="number-column">{{ $order->id }}</td>
+                                            <td class="number-column">{{ $order->id, 9 }}</td>
                                             <td class="image-column-fixed">
                                                 @if($order->images->isNotEmpty())
                                                     <img src="{{ asset('storage/' . $order->images->first()->photo_path) }}" 
@@ -653,13 +685,16 @@
                                                     <div class="no-image">لا توجد صور</div>
                                                 @endif
                                             </td> 
-                                            <td class="name-column">{{Str::limit($order->client_name, 20)}}</td>
-                                            <td class="location-column">{{Str::limit($order->location, 20)}}</td>
-                                            <td class="phone-column">{{Str::limit($order->client_phone, 20)}}</td>
+                                            <td class="name-column">{{Str::limit($order->client_name, 15)}}</td>
+                                            <td class="location-column">{{Str::limit($order->location, 15)}}</td>
+                                            <td class="phone-column">{{Str::limit($order->client_phone, 15)}}</td>
                                             <td class="status-column">
                                                 <span class="status-badge">
                                                     {{ $order->status->name ?? 'N/A' }}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                {{ $order->is_wholesale ? 'جمله' : 'قطاعي' }}
                                             </td>
                                             <td class="price-column">{{$order->total_price}}</td>
                                             <td class="actions-column">

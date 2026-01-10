@@ -44,6 +44,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('products', ProductController::class);
     Route::delete('/products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');
+    Route::get('/products/{product}/details', [ProductController::class, 'getDetails'])
+        ->name('products.details');
+    
 
     Route::resource('colors', \App\Http\Controllers\ColorController::class);
 

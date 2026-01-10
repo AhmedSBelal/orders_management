@@ -15,7 +15,11 @@ class InvoiceController extends Controller
     {
         $order->load(['products', 'user']);
         
-        $html = view('invoices.purchase', compact('order'))->render();
+        // جلب الألوان مرة واحدة لتجنب N+1 queries
+        $colorIds = $order->products->pluck('pivot.color_id')->filter()->unique();
+        $colors = \App\Models\Color::whereIn('id', $colorIds)->get()->keyBy('id');
+        
+        $html = view('invoices.purchase', compact('order', 'colors'))->render();
         
         $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8');
         

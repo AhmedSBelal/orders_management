@@ -92,6 +92,41 @@
         .products-table .item-name {
             text-align: right;
         }
+        
+        /* أنماط جديدة */
+        .order-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .wholesale-badge {
+            background-color: #28a745;
+            color: white;
+        }
+        .retail-badge {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 9px;
+            display: block;
+        }
+        .wholesale-price {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .discount-highlight {
+            background-color: #fff3cd;
+            border-left: 3px solid #ffc107;
+        }
+        .discount-row {
+            background-color: #d4edda;
+        }
         .grand-total-row {
             background-color: #e0e0e0 !important;
             font-weight: bold;
@@ -119,12 +154,20 @@
                 </td>
                 <td style="width: 70%;">
                     <div class="company-name">أجياد مكة</div>
-                    <div style="text-align: center; font-size: 13px; margin-top: 4px;">فاتورة شراء</div>
+                    <div style="text-align: center; font-size: 13px; margin-top: 4px;">
+                        فاتورة شراء 
+                        @if($order->is_wholesale)
+                            <span class="order-type-badge wholesale-badge">جمله</span>
+                        @else
+                            <span class="order-type-badge retail-badge">قطاعي</span>
+                        @endif
+                    </div>
                 </td>
                 <td style="width: 15%; text-align: left;">
                     <div class="invoice-details">
                         <div><strong>رقم الفاتورة:</strong> {{ $order->id }}</div>
                         <div><strong>التاريخ:</strong> {{ $order->created_at->locale('ar')->translatedFormat('d/m/Y') }}</div>
+                        <div><strong>النوع:</strong> {{ $order->is_wholesale ? 'جمله' : 'قطاعي' }}</div>
                     </div>
                 </td>
             </tr>
@@ -163,35 +206,167 @@
             </thead>
             <tbody>
                 @php
-                    // Load all colors once to avoid N+1 queries
-                    $colorIds = $order->products->pluck('pivot.color_id')->filter()->unique();
-                    $colors = \App\Models\Color::whereIn('id', $colorIds)->get()->keyBy('id');
+                    $totalQuantity = 0;
+                    $totalAmount = 0;
+                    $totalOriginalAmount = 0;
                 @endphp
                 
                 @foreach($order->products as $product)
-                <tr>
-                    <td class="item-name">{{ $product->name }}</td>
-                    <td>
-                        @if($product->pivot->color_id && isset($colors[$product->pivot->color_id]))
-                            {{ $colors[$product->pivot->color_id]->name }}
-                        @else
-                            -
-                        @endif
-                    </td>
-                    <td>{{ $product->pivot->size ?? '-' }}</td>
-                    <td>{{ $product->pivot->quantity }}</td>
-                    <td>{{ number_format($product->price, 2) }} جنيه</td>
-                    <td>{{ number_format($product->price * $product->pivot->quantity, 2) }} جنيه</td>
-                </tr>
+                    @php
+                        // استخدام السعر من pivot table (السعر المستخدم فعلياً)
+                        $usedPrice = $product->pivot->price ?? $product->price;
+                        $originalPrice = $product->price; // السعر القطاعي الأصلي
+                        $wholesalePrice = $product->wholesale_price ?? $product->price; // سعر الجمله
+                        
+                        $subtotal = $usedPrice * $product->pivot->quantity;
+                        $originalSubtotal = $originalPrice * $product->pivot->quantity;
+                        
+                        $totalQuantity += $product->pivot->quantity;
+                        $totalAmount += $subtotal;
+                        $totalOriginalAmount += $originalSubtotal;
+                        
+                        $isWholesaleOrder = $order->is_wholesale;
+                        $hasDiscount = $order->total_price_after_discount > 0 && $order->total_price_after_discount != $order->total_price;
+                    @endphp
+                    
+                    <tr @if($isWholesaleOrder && $usedPrice < $originalPrice) class="discount-highlight" @endif>
+                        <td class="item-name">
+                            {{ $product->name }}
+                            @if($isWholesaleOrder && $usedPrice < $originalPrice)
+                                <br><small class="text-success">(سعر جمله)</small>
+                            @endif
+                        </td>
+                        <td>
+                            @if($product->pivot->color_id && isset($colors[$product->pivot->color_id]))
+                                {{ $colors[$product->pivot->color_id]->name }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td>{{ $product->pivot->size ?? '-' }}</td>
+                        <td>{{ $product->pivot->quantity }}</td>
+                        <td>
+                            @if($isWholesaleOrder && $usedPrice < $originalPrice)
+                                <span class="original-price">{{ $originalPrice}} ج</span>
+                                <span class="wholesale-price">{{ $usedPrice}} ج</span>
+                            @else
+                                {{ $usedPrice}} ج
+                            @endif
+                        </td>
+                        <td>{{ $subtotal }} ج</td>
+                    </tr>
                 @endforeach
                 
-                <!-- Grand Total Row -->
+                <!-- صف المجموع -->
                 <tr class="grand-total-row">
                     <td class="item-name" colspan="3">المجموع الكلي</td>
-                    <td>{{ $order->products->sum('pivot.quantity') }}</td>
+                    <td>{{ $totalQuantity }}</td>
                     <td>-</td>
-                    <td>{{ number_format($order->total_price, 2) }} جنيه</td>
-                    <td>-</td>
+                    <td>{{$totalAmount }} ج</td>
+                </tr>
+                
+                <!-- عرض السعر الأصلي إذا كان طلب جمله -->
+                @if($isWholesaleOrder && $totalOriginalAmount > $totalAmount)
+                    <tr>
+                        <td colspan="3" class="text-end">
+                            <strong>السعر الأصلي (قطاعي):</strong>
+                        </td>
+                        <td colspan="2"></td>
+                        <td>
+                            <span style="text-decoration: line-through; color: #6c757d;">
+                                {{ $totalOriginalAmount }} ج
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="discount-row">
+                        <td colspan="3" class="text-end">
+                            <strong>الخصم:</strong>
+                        </td>
+                        <td colspan="2"></td>
+                        <td>
+                            <span class="text-success">
+                                -{{ $totalOriginalAmount - $totalAmount }} ج
+                                ({{ $totalOriginalAmount > 0 ? round((($totalOriginalAmount - $totalAmount) / $totalOriginalAmount) * 100, 2) : 0 }}%)
+                            </span>
+                        </td>
+                    </tr>
+                @endif
+                
+                <!-- عرض خصم إضافي إذا كان هناك total_price_after_discount -->
+                @if($order->total_price_after_discount > 0 && $order->total_price_after_discount != $totalAmount)
+                    <tr class="discount-row">
+                        <td colspan="3" class="text-end">
+                            <strong>الخصم الإضافي:</strong>
+                        </td>
+                        <td colspan="2"></td>
+                        <td>
+                            <span class="text-success">
+                                -{{ $totalAmount - $order->total_price_after_discount }} ج
+                                ({{ $totalAmount > 0 ? round((($totalAmount - $order->total_price_after_discount) / $totalAmount) * 100, 2) : 0 }}%)
+                            </span>
+                        </td>
+                    </tr>
+                    
+                    <!-- السعر النهائي بعد الخصم الإضافي -->
+                    <tr class="grand-total-row" style="background-color: #d4edda;">
+                        <td colspan="3" class="text-end">
+                            <strong>السعر النهائي بعد الخصم:</strong>
+                        </td>
+                        <td colspan="2"></td>
+                        <td class="text-success">
+                            {{$order->total_price_after_discount }} ج
+                        </td>
+                    </tr>
+                @else
+                    <!-- إذا لم يكن هناك خصم إضافي -->
+                    <tr class="grand-total-row" style="background-color: #d4edda;">
+                        <td colspan="3" class="text-end">
+                            <strong>المبلغ الإجمالي:</strong>
+                        </td>
+                        <td colspan="2"></td>
+                        <td>
+                            {{ $totalAmount }} ج
+                        </td>
+                    </tr>
+                @endif
+                
+                <!-- المقدم والمتبقي -->
+                @if($order->deposited > 0)
+                    <tr>
+                        <td colspan="3" class="text-end">
+                            <strong>المبلغ المدفوع:</strong>
+                        </td>
+                        <td colspan="2"></td>
+                        <td class="text-success">
+                            {{ $order->deposited }} ج
+                        </td>
+                    </tr>
+                    
+                    @php
+                        $finalPrice = $order->total_price_after_discount > 0 ? $order->total_price_after_discount : $totalAmount;
+                        $remainingAmount = $finalPrice - $order->deposited;
+                    @endphp
+                    
+                    <tr>
+                        <td colspan="3" class="text-end">
+                            <strong>المبلغ المتبقي:</strong>
+                        </td>
+                        <td colspan="2"></td>
+                        <td class="{{ $remainingAmount > 0 ? 'text-danger' : 'text-success' }}">
+                            {{ $remainingAmount }} ج
+                        </td>
+                    </tr>
+                @endif
+                
+                <!-- ملاحظة خاصة بنوع الطلب -->
+                <tr>
+                    <td colspan="6" style="padding: 10px; text-align: center; font-size: 9px; background-color: #f8f9fa;">
+                        @if($order->is_wholesale)
+                            <strong>ملاحظة:</strong> هذه فاتورة جمله - جميع الأسعار هي أسعار جمله مخفضة
+                        @else
+                            <strong>ملاحظة:</strong> هذه فاتورة قطاعي - الأسعار هي أسعار القطاعي
+                        @endif
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -200,6 +375,9 @@
         <div class="footer">
             <p><strong>شكراً لتعاملكم معنا!</strong></p>
             <p>أجياد مكة - جميع الحقوق محفوظة</p>
+            <p style="font-size: 8px; color: #6c757d; margin-top: 5px;">
+                تم إنشاء الفاتورة في: {{ now()->locale('ar')->translatedFormat('Y-m-d H:i:s') }}
+            </p>
         </div>
     </div>
 </body>

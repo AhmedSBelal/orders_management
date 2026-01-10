@@ -4,45 +4,34 @@ namespace App\Http\Requests\Products;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ProductCreateRequest extends FormRequest
+class ProductUpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric',
+            'price' => 'required|numeric|min:0',
             'wholesale_price' => 'required|numeric|min:0|lte:price',
-            'cost' => 'required|numeric',
-            'type' => 'required|string|max:255',
+            'cost' => 'required|numeric|min:0',
             'tailor_name' => 'nullable|string|max:255',
-             // إضافة قواعد التحقق للصور
-            'photos' => 'nullable',
-            'photos.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // كل صورة يجب أن تكون صورة حقيقية، من الأنواع المحددة، وحجمها الأقصى 2 ميجابايت (2048 كيلوبايت)
+            'type' => 'required|string|max:255',
+            'photos' => 'nullable|array',
+            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
 
-     /**
-     * Get custom messages for validator errors.
-     *
-     * @return array
-     */
     public function messages(): array
     {
         return [
+            'price.required' => 'السعر القطاعي مطلوب',
+            'wholesale_price.required' => 'سعر الجمله مطلوب',
+            'wholesale_price.lte' => 'سعر الجمله يجب أن يكون أقل من أو يساوي السعر القطاعي',
             'photos.*.image' => 'يجب أن يكون كل ملف مرفوع صورة.',
             'photos.*.mimes' => 'صيغ الصور المسموح بها هي: jpeg, png, jpg, gif فقط.',
             'photos.*.max' => 'حجم كل صورة يجب ألا يتجاوز 2 ميجابايت.',

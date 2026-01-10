@@ -16,6 +16,7 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
+        'is_wholesale',
         'location',
         'client_name',
         'client_phone',
@@ -39,7 +40,7 @@ class Order extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'order_product', 'order_id')
-            ->withPivot('color_id', 'quantity', 'size', 'is_done'); // Include pivot columns;
+            ->withPivot('color_id', 'quantity', 'size', 'is_done', 'price'); // Include pivot columns;
     }
 
     public function status(): BelongsTo // <-- إضافة العلاقة الجديدة
@@ -107,7 +108,84 @@ class Order extends Model
             $orders->whereDate('updated_at', $request->updated_at);
         }
 
+        if (isset($request->is_wholesale) && $request->is_wholesale !== '') {
+            // يمكن تمرير القيمة كـ 0/1 أو true/false
+            $orders->where('is_wholesale', (bool) $request->is_wholesale);
+        }
+
         return $orders;
+    }
+
+
+    // Accessor للحصول على النوع كنص (اختياري)
+    public function getOrderTypeAttribute(): string
+    {
+        return $this->is_wholesale ? 'جمله' : 'قطاعي';
+    }
+    
+    // Accessor للحصول على النوع باللغة الإنجليزية (اختياري)
+    public function getOrderTypeEnglishAttribute(): string
+    {
+        return $this->is_wholesale ? 'wholesale' : 'retail';
+    }
+    
+    // دالة للتحقق من النوع (اختياري)
+    public function isWholesale(): bool
+    {
+        return (bool) $this->is_wholesale;
+    }
+    
+    public function isRetail(): bool
+    {
+        return !$this->is_wholesale;
+    }
+    
+    // دالة لتغيير النوع (اختياري)
+    public function setAsWholesale(): void
+    {
+        $this->is_wholesale = true;
+    }
+    
+    public function setAsRetail(): void
+    {
+        $this->is_wholesale = false;
+    }
+
+    // دالة لحساب السعر الإجمالي بناءً على نوع الطلب
+    public function calculateTotalPrice()
+    {
+        $total = 0;
+        
+        foreach ($this->products as $product) {
+            $productPrice = $product->getPriceByOrderType($this->is_wholesale);
+            $quantity = $product->pivot->quantity ?? 1;
+            $total += $productPrice * $quantity;
+        }
+        
+        $this->total_price = $total;
+        return $total;
+    }
+
+    // عند إضافة منتج للطلب، استخدم السعر المناسب
+    public function addProduct(Product $product, $quantity = 1, $attributes = [])
+    {
+        $price = $product->getPriceByOrderType($this->is_wholesale);
+        
+        $this->products()->attach($product->id, array_merge([
+            'quantity' => $quantity,
+            'price' => $price, // يمكنك إضافة حقل price للـ pivot إذا أردت
+        ], $attributes));
+        
+        $this->calculateTotalPrice();
+        $this->save();
+    }
+
+    // للحصول على السعر الإجمالي من pivot table مباشرة
+    public function getTotalFromPivotAttribute()
+    {
+        return $this->products->sum(function ($product) {
+            return $product->pivot->price * $product->pivot->quantity;
+        });
     }
 
 }

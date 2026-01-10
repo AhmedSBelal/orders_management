@@ -19,9 +19,16 @@ class Product extends Model
         'name',
         'description',
         'price',
+        'wholesale_price',
         'cost',
         'tailor_name',
         'type'
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+        'wholesale_price' => 'decimal:2',
+        'cost' => 'decimal:2',
     ];
 
     // relations
@@ -30,7 +37,8 @@ class Product extends Model
     }
 
     public function orders(): BelongsToMany {
-        return $this->belongsToMany( Order::class, 'order_product', 'product_id');
+        return $this->belongsToMany( Order::class, 'order_product', 'product_id')
+        ->withPivot('color_id', 'quantity', 'size', 'is_done', 'price');
     }
 
     /**
@@ -41,8 +49,8 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
-    static function productsByFilter($request) {
-
+    static function productsByFilter($request) 
+    {
         $products = self::query();
 
         if (!empty($request->name)) {
@@ -55,6 +63,11 @@ class Product extends Model
 
         if (!empty($request->price)) {
             $products->where('price', 'like', '%' . $request->price . '%');
+        }
+
+        // فلترة حسب سعر الجمله
+        if (!empty($request->wholesale_price)) {
+            $products->where('wholesale_price', 'like', '%' . $request->wholesale_price . '%');
         }
 
         if (!empty($request->cost)) {
@@ -78,7 +91,29 @@ class Product extends Model
         }
 
         return $products;
+    }
 
+    // دالة للحصول على السعر بناءً على نوع الطلب
+    public function getPriceByOrderType($isWholesale = false)
+    {
+        if ($isWholesale) {
+            return $this->wholesale_price ?? $this->price;
+        }
+        return $this->price;
+    }
+
+    // دالة للحصول على نسبة الخصم الجمله
+    public function getWholesaleDiscountPercentageAttribute()
+    {
+        if (!$this->wholesale_price || $this->price == 0) {
+            return 0;
+        }
+        return round((($this->price - $this->wholesale_price) / $this->price) * 100, 2);
+    }
+    // دالة للحصول على الفرق بين السعرين
+    public function getPriceDifferenceAttribute()
+    {
+        return $this->price - ($this->wholesale_price ?? $this->price);
     }
 
 }

@@ -53,6 +53,8 @@ class OrderUpdateRequest extends FormRequest
             // Validation for deleting existing images
             "delete_images"   => "nullable|array",
             "delete_images.*" => "integer|exists:order_images,id",
+
+            'is_wholesale' => 'sometimes|boolean',
         ];
     }
 }
